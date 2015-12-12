@@ -80,12 +80,12 @@ class Archive(object):
 
         if rarfile and is_rar(self.path):
             with rarfile.RarFile(self.path, "r") as f:
-                self.fnlist = sorted(filter(is_image, map(to_unicode, f.namelist())))
+                self.fnlist = sorted(filter(is_image, f.namelist()))
             return
 
         if is_zip(self.path):
             with zipfile.ZipFile(self.path, "r") as f:
-                self.fnlist = sorted(filter(is_image, map(to_unicode, f.namelist())))
+                self.fnlist = sorted(filter(is_image, f.namelist()))
             return
 
         raise RuntimeError("Cannot open rar: please install python2-rarfile")

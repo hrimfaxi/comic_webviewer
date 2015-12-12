@@ -66,7 +66,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         html += "<a href='/'>Up</a><p>\n"
         for idx, apath in enumerate(fnlist):
             html += "<a href=\"view?aid=%s&pid=%d\">%s</a><br>\n" \
-                    % (args['aid'], idx, (apath.encode('utf8')))
+                    % (args['aid'], idx, (archive.to_unicode(apath).encode('utf-8')))
         html += "<a href='/'>Up</a><p>\n"
         html += "</body></html>"
 
