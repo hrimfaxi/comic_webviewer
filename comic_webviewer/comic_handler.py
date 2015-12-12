@@ -58,10 +58,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if 'aid' not in args:
             return self.send_error(403)
 
-        try:
-            fn, arch = update_archive_list(args['aid'])
-        except Exception as e:
-            return self.send_error(503, str(e))
+        fn, arch = update_archive_list(args['aid'])
         fnlist = arch.fnlist
 
         html = "<html><meta charset=\"utf-8\"><body>"
@@ -85,10 +82,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return self.send_error(403)
 
         aid, pid = args['aid'], int(args['pid'])
-        try:
-            fn, arch = update_archive_list(args['aid'])
-        except Exception as e:
-            return self.send_error(503, str(e))
+        fn, arch = update_archive_list(args['aid'])
         fnlist = arch.fnlist
 
         html = """
@@ -187,24 +181,22 @@ $(function() {
             return self.send_error(403)
 
         aid, pid = args['aid'], int(args['pid'])
-        try:
-            fn, arch = update_archive_list(args['aid'])
-        except Exception as e:
-            return self.send_error(503, str(e))
-
+        fn, arch = update_archive_list(args['aid'])
         d = arch.read(pid)
         self.send_content(d, headers={ "Content-Type" : "image/jpeg" })
 
     def do_GET(self):
-        r = urlparse.urlparse(self.path)
+        try:
+            r = urlparse.urlparse(self.path)
 
-        if r.path == "/":
-            return self.index()
-        elif r.path == "/archive":
-            return self.archive(r)
-        elif r.path == "/view":
-            return self.view(r)
-        elif r.path == "/image":
-            return self.image(r)
-
-        self.send_error(403, "TODO")
+            if r.path == "/":
+                return self.index()
+            elif r.path == "/archive":
+                return self.archive(r)
+            elif r.path == "/view":
+                return self.view(r)
+            elif r.path == "/image":
+                return self.image(r)
+            return self.send_error(503, "invalid request")
+        except Exception as e:
+            return self.send_error(503, str(e))
