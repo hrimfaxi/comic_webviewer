@@ -124,11 +124,21 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         $(window).bind('resize', set_body_width);
         set_body_width();
       });
-      $(window).scroll(function() {
-       if($(window).scrollTop() + $(window).height() == $(document).height()) {
-            window.location.href = '/view?aid=%s&pid=%d';
-       }
-      });
+function getDocHeight() {
+var D = document;
+return Math.max(
+	D.body.scrollHeight, D.documentElement.scrollHeight,
+	D.body.offsetHeight, D.documentElement.offsetHeight,
+	D.body.clientHeight, D.documentElement.clientHeight
+	);
+}
+$(function() {
+	$('html').keydown(function(e) {
+	    if ($(window).scrollTop() + $(window).height() == getDocHeight() && (e.keyCode == 34 || e.keyCode == 32)) {
+			window.location.href = '/view?aid=%s&pid=%d';
+	    }
+	});
+});
     </script>""" % (aid, pid+1)
         else:
             html += "<img src=\"/image?aid=%s&pid=%d\" class=\"center fit\" onclick=\"window.location.href = '/archive?aid=%s';\">\n" % (aid, pid, aid)
@@ -142,11 +152,21 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         $(window).bind('resize', set_body_width);
         set_body_width();
       });
-      $(window).scroll(function() {
-       if($(window).scrollTop() + $(window).height() == $(document).height()) {
-            window.location.href = '/archive?aid=%s';
-       }
-      });
+function getDocHeight() {
+var D = document;
+return Math.max(
+	D.body.scrollHeight, D.documentElement.scrollHeight,
+	D.body.offsetHeight, D.documentElement.offsetHeight,
+	D.body.clientHeight, D.documentElement.clientHeight
+	);
+}
+$(function() {
+	$('html').keydown(function(e) {
+	    if ($(window).scrollTop() + $(window).height() == getDocHeight() && (e.keyCode == 34 || e.keyCode == 32)) {
+			window.location.href = '/archive?aid=%s';
+	    }
+	});
+});
     </script>""" % (aid)
 
         self.send_content(html)
