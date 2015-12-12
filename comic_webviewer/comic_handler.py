@@ -58,7 +58,10 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if 'aid' not in args:
             return self.send_error(403)
 
-        fn, arch = update_archive_list(args['aid'])
+        try:
+            fn, arch = update_archive_list(args['aid'])
+        except Exception as e:
+            return self.send_error(503, str(e))
         fnlist = arch.fnlist
 
         html = "<html><meta charset=\"utf-8\"><body>"
@@ -82,7 +85,10 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return self.send_error(403)
 
         aid, pid = args['aid'], int(args['pid'])
-        fn, arch = update_archive_list(aid)
+        try:
+            fn, arch = update_archive_list(args['aid'])
+        except Exception as e:
+            return self.send_error(503, str(e))
         fnlist = arch.fnlist
 
         html = """
@@ -181,7 +187,10 @@ $(function() {
             return self.send_error(403)
 
         aid, pid = args['aid'], int(args['pid'])
-        fn, arch = update_archive_list(aid)
+        try:
+            fn, arch = update_archive_list(args['aid'])
+        except Exception as e:
+            return self.send_error(503, str(e))
 
         d = arch.read(pid)
         self.send_content(d, headers={ "Content-Type" : "image/jpeg" })
