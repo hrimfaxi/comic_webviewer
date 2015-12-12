@@ -106,7 +106,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 </head>
 <body>
 """
-        html += "<div align=center>\n"
+        html += "<div align=center style=\"padding: 4px;\">\n"
         if pid > 1: html += "<a href='/view?aid=%s&pid=%d'>Prev</a>\n" % (aid, pid-1)
         html += "<a href='/archive?aid=%s'>Up</a>\n" % (aid)
         if pid+1 < len(fnlist): html += "<a href='/view?aid=%s&pid=%d'>Next</a>\n" % (aid, pid+1)
