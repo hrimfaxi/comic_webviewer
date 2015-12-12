@@ -47,7 +47,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def index(self):
         html = "<html><meta charset=\"utf-8\"><body>\n"
-        for a in archive.archive:
+        for a in sorted(archive.archive, key=lambda x: archive.archive[x]):
             html += "<a href=\"/archive?aid=%s\">%s</a><br>" % (a, os.path.basename(archive.archive[a]))
         html += "</body></html>\n"
         self.send_content(html)
