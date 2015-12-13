@@ -90,7 +90,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         <!DOCTYPE html>
 <html>
 <head>
-<title>%s - [%d / %d]</title>
+<title>%s - %s - [%d / %d]</title>
 <meta charset="utf-8">
 </head>
 <head>
@@ -110,7 +110,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 </style>
 </head>
 <body>
-""" % (archive.to_unicode(fnlist[pid]).encode('utf-8'), pid+1, len(fnlist))
+""" % (os.path.basename(fn), archive.to_unicode(fnlist[pid]).encode('utf-8'), pid+1, len(fnlist))
         html += "<div align=center style=\"padding: 4px;\">%d / %d<br>\n" % (pid+1, len(fnlist))
         if pid > 1: html += "<a href='/view?aid=%s&pid=%d'>Prev</a>\n" % (aid, pid-1)
         html += "<a href='/archive?aid=%s#pid%d'>Up</a>\n" % (aid, pid)
