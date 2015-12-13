@@ -202,6 +202,8 @@ $(function() {
                 return self.view(r)
             elif r.path == "/image":
                 return self.image(r)
+            elif r.path == "/favicon.ico":
+                return self.send_error(404)
             return self.send_error(503, "invalid request")
         except Exception as e:
             return self.send_error(503, str(e))
