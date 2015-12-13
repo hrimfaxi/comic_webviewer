@@ -46,7 +46,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def index(self):
-        html = "<html><meta charset=\"utf-8\"><body>\n"
+        html = "<html><head><meta charset=\"utf-8\"><title>%s</title></head><body>\n" % ("Comic Web Viewer")
         for a in sorted(archive.archive, key=lambda x: archive.archive[x]):
             html += "<a id=\"aid%s\" href=\"/archive?aid=%s\">%s</a><br>" % (a, a, os.path.basename(archive.archive[a]))
         html += "</body></html>\n"
@@ -62,7 +62,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         fnlist = arch.fnlist
         aid = args['aid']
 
-        html = "<html><meta charset=\"utf-8\"><body>"
+        html = "<html><head><meta charset=\"utf-8\"><title>%s</title></head><body>" % (os.path.basename(fn))
         html += "<h1>%s</h1>" % (os.path.basename(fn))
         html += "<a href='/#aid%s'>Up</a><p>\n" % (aid)
         for idx, apath in enumerate(fnlist):
@@ -89,7 +89,10 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         html = """
         <!DOCTYPE html>
 <html>
+<head>
+<title>%s - [%d / %d]</title>
 <meta charset="utf-8">
+</head>
 <head>
 <style>
   * {
@@ -97,8 +100,8 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     margin: 0;
   }
   .fit { /* set relative picture size */
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 100%%;
+    max-height: 100%%;
   }
   .center {
     display: block;
@@ -107,7 +110,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 </style>
 </head>
 <body>
-"""
+""" % (archive.to_unicode(fnlist[pid]).encode('utf-8'), pid+1, len(fnlist))
         html += "<div align=center style=\"padding: 4px;\">%d / %d<br>\n" % (pid+1, len(fnlist))
         if pid > 1: html += "<a href='/view?aid=%s&pid=%d'>Prev</a>\n" % (aid, pid-1)
         html += "<a href='/archive?aid=%s#pid%d'>Up</a>\n" % (aid, pid)
