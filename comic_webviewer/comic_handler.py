@@ -48,7 +48,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def index(self):
         html = "<html><meta charset=\"utf-8\"><body>\n"
         for a in sorted(archive.archive, key=lambda x: archive.archive[x]):
-            html += "<a name=\"aid%s\"><a href=\"/archive?aid=%s\">%s</a><br>" % (a, a, os.path.basename(archive.archive[a]))
+            html += "<a id=\"aid%s\" href=\"/archive?aid=%s\">%s</a><br>" % (a, a, os.path.basename(archive.archive[a]))
         html += "</body></html>\n"
         self.send_content(html)
 
@@ -66,7 +66,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         html += "<h1>%s</h1>" % (os.path.basename(fn))
         html += "<a href='/#aid%s'>Up</a><p>\n" % (aid)
         for idx, apath in enumerate(fnlist):
-            html += "<a name=\"pid%d\"></a><a href=\"view?aid=%s&pid=%d\">%s</a><br>\n" \
+            html += "<a id=\"pid%d\" href=\"view?aid=%s&pid=%d\">%s</a><br>\n" \
                     % (idx, aid, idx, (archive.to_unicode(apath).encode('utf-8')))
         html += "<a href='/#aid%s'>Up</a><p>\n" % (aid)
         html += "</body></html>"
