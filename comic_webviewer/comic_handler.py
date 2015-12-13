@@ -48,7 +48,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     def index(self):
         html = "<html><meta charset=\"utf-8\"><body>\n"
         for a in sorted(archive.archive, key=lambda x: archive.archive[x]):
-            html += "<a href=\"/archive?aid=%s\">%s</a><br>" % (a, os.path.basename(archive.archive[a]))
+            html += "<a name=\"aid%s\"><a href=\"/archive?aid=%s\">%s</a><br>" % (a, a, os.path.basename(archive.archive[a]))
         html += "</body></html>\n"
         self.send_content(html)
 
@@ -60,14 +60,15 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
         fn, arch = update_archive_list(args['aid'])
         fnlist = arch.fnlist
+        aid = args['aid']
 
         html = "<html><meta charset=\"utf-8\"><body>"
         html += "<h1>%s</h1>" % (os.path.basename(fn))
-        html += "<a href='/'>Up</a><p>\n"
+        html += "<a href='/#aid%s'>Up</a><p>\n" % (aid)
         for idx, apath in enumerate(fnlist):
-            html += "<a href=\"view?aid=%s&pid=%d\">%s</a><br>\n" \
-                    % (args['aid'], idx, (archive.to_unicode(apath).encode('utf-8')))
-        html += "<a href='/'>Up</a><p>\n"
+            html += "<a name=\"pid%d\"></a><a href=\"view?aid=%s&pid=%d\">%s</a><br>\n" \
+                    % (idx, aid, idx, (archive.to_unicode(apath).encode('utf-8')))
+        html += "<a href='/#aid%s'>Up</a><p>\n" % (aid)
         html += "</body></html>"
 
         self.send_content(html)
@@ -88,6 +89,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         html = """
         <!DOCTYPE html>
 <html>
+<meta charset="utf-8">
 <head>
 <style>
   * {
@@ -108,7 +110,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 """
         html += "<div align=center style=\"padding: 4px;\">\n"
         if pid > 1: html += "<a href='/view?aid=%s&pid=%d'>Prev</a>\n" % (aid, pid-1)
-        html += "<a href='/archive?aid=%s'>Up</a>\n" % (aid)
+        html += "<a href='/archive?aid=%s#pid%d'>Up</a>\n" % (aid, pid)
         if pid+1 < len(fnlist): html += "<a href='/view?aid=%s&pid=%d'>Next</a>\n" % (aid, pid+1)
         html += "</div>\n"
 
