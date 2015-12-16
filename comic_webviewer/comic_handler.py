@@ -24,12 +24,6 @@ def popluate_arg(query):
 
     return r
 
-def update_archive_list(aid):
-    fn = archive.archive[aid]
-    a = archive.Archive(fn)
-
-    return fn, a
-
 class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     __base = BaseHTTPServer.BaseHTTPRequestHandler
     __base_handle = __base.handle
@@ -58,7 +52,8 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         if 'aid' not in args:
             return self.send_error(403)
 
-        fn, arch = update_archive_list(args['aid'])
+        fn = archive.archive[args['aid']]
+        arch = archive.Archive(fn)
         fnlist = arch.fnlist
         aid = args['aid']
 
@@ -83,7 +78,8 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
             return self.send_error(403)
 
         aid, pid = args['aid'], int(args['pid'])
-        fn, arch = update_archive_list(args['aid'])
+        fn = archive.archive[args['aid']]
+        arch = archive.Archive(fn)
         fnlist = arch.fnlist
 
         html = """
@@ -132,17 +128,17 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 function getDocHeight() {
 var D = document;
 return Math.max(
-	D.body.scrollHeight, D.documentElement.scrollHeight,
-	D.body.offsetHeight, D.documentElement.offsetHeight,
-	D.body.clientHeight, D.documentElement.clientHeight
-	);
+    D.body.scrollHeight, D.documentElement.scrollHeight,
+    D.body.offsetHeight, D.documentElement.offsetHeight,
+    D.body.clientHeight, D.documentElement.clientHeight
+    );
 }
 $(function() {
-	$('html').keydown(function(e) {
-	    if ($(window).scrollTop() + $(window).height() == getDocHeight() && (e.keyCode == 34 || e.keyCode == 32)) {
-			window.location.href = '/view?aid=%s&pid=%d';
-	    }
-	});
+    $('html').keydown(function(e) {
+        if ($(window).scrollTop() + $(window).height() == getDocHeight() && (e.keyCode == 34 || e.keyCode == 32)) {
+            window.location.href = '/view?aid=%s&pid=%d';
+        }
+    });
 });
     </script>""" % (aid, pid+1)
         else:
@@ -160,17 +156,17 @@ $(function() {
 function getDocHeight() {
 var D = document;
 return Math.max(
-	D.body.scrollHeight, D.documentElement.scrollHeight,
-	D.body.offsetHeight, D.documentElement.offsetHeight,
-	D.body.clientHeight, D.documentElement.clientHeight
-	);
+    D.body.scrollHeight, D.documentElement.scrollHeight,
+    D.body.offsetHeight, D.documentElement.offsetHeight,
+    D.body.clientHeight, D.documentElement.clientHeight
+    );
 }
 $(function() {
-	$('html').keydown(function(e) {
-	    if ($(window).scrollTop() + $(window).height() == getDocHeight() && (e.keyCode == 34 || e.keyCode == 32)) {
-			window.location.href = '/archive?aid=%s';
-	    }
-	});
+    $('html').keydown(function(e) {
+        if ($(window).scrollTop() + $(window).height() == getDocHeight() && (e.keyCode == 34 || e.keyCode == 32)) {
+            window.location.href = '/archive?aid=%s';
+        }
+    });
 });
     </script>""" % (aid)
 
@@ -186,7 +182,9 @@ $(function() {
             return self.send_error(403)
 
         aid, pid = args['aid'], int(args['pid'])
-        fn, arch = update_archive_list(args['aid'])
+        fn = archive.archive[aid]
+        arch = archive.Archive(fn)
+        fnlist = arch.fnlist
         d = arch.read(pid)
         self.send_content(d, headers={ "Content-Type" : "image/jpeg" })
 
@@ -206,4 +204,6 @@ $(function() {
                 return self.send_error(404)
             return self.send_error(503, "invalid request")
         except Exception as e:
+            import traceback
+            print (traceback.format_exc())
             return self.send_error(503, str(e))

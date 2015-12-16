@@ -2,6 +2,7 @@
 # coding: utf-8
 
 import glob, hashlib, os.path, zipfile, sys, locale
+from comic_webviewer import tools
 
 try:
     import rarfile
@@ -80,12 +81,14 @@ class Archive(object):
 
         if rarfile and is_rar(self.path):
             with rarfile.RarFile(self.path, "r") as f:
-                self.fnlist = sorted(filter(is_image, f.namelist()))
+                self.fnlist = filter(is_image, f.namelist())
+		tools.alphanumeric_sort(self.fnlist)
             return
 
         if is_zip(self.path):
             with zipfile.ZipFile(self.path, "r") as f:
-                self.fnlist = sorted(filter(is_image, f.namelist()))
+                self.fnlist = filter(is_image, f.namelist())
+		tools.alphanumeric_sort(self.fnlist)
             return
 
         raise RuntimeError("Cannot open rar: please install python2-rarfile")
