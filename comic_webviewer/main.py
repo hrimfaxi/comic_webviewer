@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import logging, sys, os, SimpleHTTPServer, BaseHTTPServer
-import SocketServer, zipfile, glob
+import SocketServer, zipfile
 import urllib
 
 from comic_webviewer import archive

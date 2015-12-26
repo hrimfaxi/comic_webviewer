@@ -1,7 +1,7 @@
 #!/usr/bin/python2
 # coding: utf-8
 
-import glob, hashlib, os.path, zipfile, sys, locale
+import hashlib, os, zipfile, sys, locale
 from comic_webviewer import tools
 
 try:
@@ -36,10 +36,15 @@ def is_image(fn):
     return True if ext_fn in \
             (".jpeg", ".jpg", ".png", ".gif", ".bmp") else False
 
+def every_files_in_directory(directory):
+    for root, dirs, files in os.walk(directory):
+        for name in files:
+            yield os.path.join(root, name)
+
 def load(path):
     global archive
     archive = { hashlib.md5(fn).hexdigest(): fn \
-            for fn in filter(is_archive, glob.glob("%s/*" % (path))) }
+            for fn in filter(is_archive, every_files_in_directory(path)) }
 
 " 从mcomix抄来 "
 def to_unicode(string):
