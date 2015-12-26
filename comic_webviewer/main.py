@@ -7,8 +7,10 @@ import urllib
 
 from comic_webviewer import archive
 from comic_webviewer import comic_handler
+from comic_webviewer import config
 
-PORT = 8181
+load_config = config.load_config
+config = config.config
 
 class ThreadingHTTPServer(SocketServer.ThreadingMixIn,
                            BaseHTTPServer.HTTPServer):
@@ -19,18 +21,18 @@ class ThreadingHTTPServer(SocketServer.ThreadingMixIn,
         self.daemon_threads = True
 
 def run():
-    path = "."
-    if len(sys.argv) >= 2:
-        path = sys.argv[1]
-    archive.load(path)
-    print (path)
+    load_config()
+    archive.load(config['path'])
+    print ("Current directory: %s" % (config['path']))
     print ("%d archive loaded" % (len(archive.archive)))
 
     Handler = comic_handler.ComicWebViewerRequestHandler
     Handler.protocol_version = "HTTP/1.1"
-    httpd = ThreadingHTTPServer(("0.0.0.0", PORT), Handler)
-    print ("serving at port: %d" %(PORT))
+    httpd = ThreadingHTTPServer(("0.0.0.0", config['port']), Handler)
+    print ("serving at port: %d" %(config['port']))
     httpd.serve_forever()
 
 if __name__ == "__main__":
     run()
+
+# vim: set sw=4 tabstop=4 expandtab :
