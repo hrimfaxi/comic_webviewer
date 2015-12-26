@@ -5,8 +5,7 @@ import logging, sys, os, SimpleHTTPServer, BaseHTTPServer
 import SocketServer, zipfile
 import urllib, urlparse, locale
 
-from comic_webviewer import config
-config = config.config
+from comic_webviewer import tools
 
 try:
     import rarfile
@@ -27,28 +26,6 @@ def popluate_arg(query):
 
     return r
 
-def sorted_by_config(archive_list):
-    sorted_by = config['sorted_by']
-
-    if sorted_by == "time":
-        return sorted_by_time(archive_list)
-    elif sorted_by == "size":
-        return sorted_by_size(archive_list)
-    elif sorted_by == 'name':
-        return sorted_by_name(archive_list)
-    raise RuntimeError("invalid sorted_by mode")
-
-def sorted_by_name(archive_list):
-    return sorted(archive_list, key=lambda x: archive_list[x])
-
-def sorted_by_time(archive_list):
-    mtime = lambda f: os.stat(archive_list[f]).st_mtime
-    return sorted(archive_list, key=mtime, reverse=True)
-
-def sorted_by_size(archive_list):
-    mtime = lambda f: os.stat(archive_list[f]).st_size
-    return sorted(archive_list, key=mtime, reverse=True)
-
 class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
     __base = BaseHTTPServer.BaseHTTPRequestHandler
     __base_handle = __base.handle
@@ -66,7 +43,7 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
 
     def index(self):
         html = "<html><head><meta charset=\"utf-8\"><title>%s</title></head><body>\n" % ("Comic Web Viewer")
-        for a in sorted_by_config(archive.archive):
+        for a in tools.sorted_by_config(archive.archive):
             html += "<a id=\"aid%s\" href=\"/archive?aid=%s\">%s</a><br>" % (a, a, os.path.basename(archive.archive[a]))
         html += "</body></html>\n"
         self.send_content(html)
