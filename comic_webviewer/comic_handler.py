@@ -4,6 +4,8 @@
 import logging, sys, os, SimpleHTTPServer, BaseHTTPServer
 import SocketServer, zipfile
 import urllib, urlparse, locale
+from comic_webviewer import config
+config = config.config
 
 from comic_webviewer import tools
 
@@ -42,6 +44,13 @@ class ComicWebViewerRequestHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         self.wfile.write(content)
 
     def index(self):
+        timestamp = os.stat(config['path']).st_mtime
+        if config['path-timestamp'] < timestamp:
+            print (config['path-timestamp'], timestamp)
+            archive.load(config['path'])
+            print ("Current directory: %s" % (config['path']))
+            print ("%d archive loaded" % (len(archive.archive)))
+            config['path-timestamp'] = timestamp
         html = "<html><head><meta charset=\"utf-8\"><title>%s</title></head><body>\n" % ("Comic Web Viewer")
         for a in tools.sorted_by_config(archive.archive):
             html += "<a id=\"aid%s\" href=\"/archive?aid=%s\">%s</a><br>" % (a, a, os.path.basename(archive.archive[a]))

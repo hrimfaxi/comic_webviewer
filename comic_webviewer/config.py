@@ -7,6 +7,7 @@ config = {
     "port" : 8181,
     "path" : ".",
     "sorted_by" : "numeric",
+    'path-timestamp' : 0.0,
 }
 
 def load_config():
