@@ -96,7 +96,7 @@ class Archive(object):
 		tools.alphanumeric_sort(self.fnlist)
             return
 
-        raise RuntimeError("Cannot open rar: please install python2-rarfile")
+        raise RuntimeError("Cannot open rar: please install python-rarfile")
 
     def read(self, pid):
         if rarfile and is_rar(self.path):
@@ -106,7 +106,7 @@ class Archive(object):
         with zipfile.ZipFile(self.path, "r") as f:
             return f.read(self.fnlist[pid])
 
-        raise RuntimeError("Cannot open rar: please install python2-rarfile")
+        raise RuntimeError("Cannot open rar: please install python-rarfile")
 
 if __name__ == "__main__":
     load_archive(".")
