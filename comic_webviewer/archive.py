@@ -34,7 +34,7 @@ def is_image(fn):
     ext_fn = os.path.splitext(fn)[-1].lower()
 
     return True if ext_fn in \
-            (".jpeg", ".jpg", ".png", ".gif", ".bmp") else False
+            (".jpeg", ".jpg", ".png", ".gif", ".bmp", ".webp") else False
 
 def every_files_in_directory(directory):
     for root, dirs, files in os.walk(directory):
