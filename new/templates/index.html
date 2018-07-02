@@ -1,8 +1,9 @@
-<html>
-<head><meta charset=\"utf-8\"><title>Comic Webviewer</title></head>
-<body>
+{% extends "bootstrap/base.html" %}
+
+{% block title %}Comic Webviewer{% endblock %}
+
+{% block content %}
     {% for e in archives %}
     <ul><a id="{{e}}" href="{{url_for('archive_', aid=e)}}">{{basename(archives[e])}}</a></ul>
     {% endfor %}
-</body>
-</html>
+{% endblock %}
