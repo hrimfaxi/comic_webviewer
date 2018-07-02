@@ -2,6 +2,19 @@
 
 {% block title %}{{basename(fn)}} - {{ar.fnlist[pid]}} - [{{pid+1}} / {{len(ar.fnlist)}}]{% endblock %}
 
+{% block scripts %}
+{{super()}}
+<script type="text/javascript" language="JavaScript">
+function set_body_width() { // set body width = window width
+    $('body').width($(window).width());
+}
+$(document).ready(function() {
+    $(window).bind('resize', set_body_width);
+    set_body_width();
+});
+</script>
+{% endblock %}
+
 {% block styles %}
 {{super()}}
 <style>
