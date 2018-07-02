@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import hashlib, os, zipfile, sys, locale
-from comic_webviewer import tools
+import tools
 
 try:
     import rarfile
