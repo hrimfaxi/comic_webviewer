@@ -52,6 +52,7 @@ def image(aid):
 
     res = make_response(d)
     res.headers.set('Content-Type', 'image/jpeg')
+    res.headers.set('Cache-Control', 'max-age=3600')
     return res
 
 def main():
