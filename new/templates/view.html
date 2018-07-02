@@ -4,7 +4,7 @@
 
 {% block scripts %}
 {{super()}}
-<script type="text/javascript" language="JavaScript">
+    <script type="text/javascript" language="JavaScript">
 function set_body_width() { // set body width = window width
     $('body').width($(window).width());
 }
@@ -12,7 +12,22 @@ $(document).ready(function() {
     $(window).bind('resize', set_body_width);
     set_body_width();
 });
-</script>
+function getDocHeight() {
+var D = document;
+return Math.max(
+    D.body.scrollHeight, D.documentElement.scrollHeight,
+    D.body.offsetHeight, D.documentElement.offsetHeight,
+    D.body.clientHeight, D.documentElement.clientHeight
+    );
+}
+$(function() {
+    $('html').keydown(function(e) {
+        if ($(window).scrollTop() + $(window).height() >= getDocHeight() - 1 && (e.keyCode == 34 || e.keyCode == 32)) {
+            window.location.href = '{{next_location}}';
+        }
+    });
+});
+    </script>
 {% endblock %}
 
 {% block styles %}
@@ -23,8 +38,8 @@ $(document).ready(function() {
     margin: 0;
   }
   .fit { /* set relative picture size */
-    max-width: 100%%;
-    max-height: 100%%;
+    max-width: 100%;
+    max-height: 100%;
   }
   .center {
     display: block;
