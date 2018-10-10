@@ -3,11 +3,9 @@
 
 from flask import Flask, render_template, request, make_response, url_for
 from flask import current_app as capp
-from flask_bootstrap import Bootstrap
 import argparse, os, archive
 
 app = Flask(__name__)
-bootstrap = Bootstrap(app)
 with app.app_context():
     capp.root_path = os.path.sep.join(app.instance_path.split(os.path.sep)[:-1])
     capp.archives = archive.load(capp.root_path)
