@@ -5,7 +5,7 @@ from flask import Flask, render_template, request, make_response, url_for
 from flask import current_app as capp
 import argparse, os, archive, subprocess, tempfile, logging
 
-CWEBP_QUALITY=os.getenv('CWEBP_QUALITY', 10)
+CWEBP_QUALITY=int(os.getenv('CWEBP_QUALITY', 10))
 
 app = Flask(__name__)
 with app.app_context():
