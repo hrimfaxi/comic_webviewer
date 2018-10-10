@@ -3,7 +3,9 @@
 
 from flask import Flask, render_template, request, make_response, url_for
 from flask import current_app as capp
-import argparse, os, archive
+import argparse, os, archive, subprocess, tempfile, logging
+
+CWEBP_QUALITY=os.getenv('CWEBP_QUALITY', 10)
 
 app = Flask(__name__)
 with app.app_context():
@@ -47,10 +49,25 @@ def image(aid):
     ar = archive.Archive(fn)
     pid = int(request.args.get('pid'))
     d = ar.read(pid)
+    want_webp = False
+
+    if 'image/webp' in request.headers['accept'].split(','):
+        # convert into webp
+        # cwebp didn't support stdin/stdout, output to temp file
+        want_webp = True
+        with tempfile.NamedTemporaryFile(prefix='comic_webviewer') as temp:
+            temp.write(d)
+            temp.flush()
+            null = open(os.devnull, 'wb')
+            p = subprocess.Popen(['cwebp', '-q', '%d' % (CWEBP_QUALITY), temp.name, '-o', '-'], stderr=null, stdout=subprocess.PIPE)
+            stdout, _ = p.communicate()
+            logging.warning('Webp: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
+            d = stdout
+            del null, p
 
     res = make_response(d)
-    res.headers.set('Content-Type', 'image/jpeg')
     res.headers.set('Cache-Control', 'max-age=3600')
+    res.headers.set('Content-Type', 'image/webp' if want_webp else 'image/jpeg')
     return res
 
 def main():
