@@ -59,7 +59,7 @@ def image(aid):
             temp.write(d)
             temp.flush()
             null = open(os.devnull, 'wb')
-            p = subprocess.Popen(['cwebp', '-q', '%d' % (CWEBP_QUALITY), temp.name, '-o', '-'], stderr=null, stdout=subprocess.PIPE)
+            p = subprocess.Popen(['cwebp', '-preset', 'drawing', '-q', '%d' % (CWEBP_QUALITY), temp.name, '-o', '-'], stderr=null, stdout=subprocess.PIPE)
             stdout, _ = p.communicate()
             logging.warning('Webp: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
             d = stdout
