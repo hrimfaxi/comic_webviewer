@@ -3,7 +3,7 @@
 {% block title %}{{basename(fn)}} - {{ar.fnlist[pid]}} - [{{pid+1}} / {{len(ar.fnlist)}}]{% endblock %}
 
 {% block scripts %}
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.3.1/jquery.js"></script>
+    <script src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
     <script type="text/javascript" language="JavaScript">
 function set_body_width() { // set body width = window width
     $('body').width($(window).width());
