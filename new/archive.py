@@ -16,14 +16,14 @@ except ImportError:
     pass
 
 def is_rar(fn):
-    ext_fn = os.path.splitext(fn)[-1].lower()
-
-    return ext_fn in (".rar", ".cbr")
+    with open(fn, "rb") as f:
+        magic = f.read(4)
+    return magic == b'Rar!'
 
 def is_zip(fn):
-    ext_fn = os.path.splitext(fn)[-1].lower()
-
-    return ext_fn in (".zip", ".cbz")
+    with open(fn, "rb") as f:
+        magic = f.read(2)
+    return magic == b'PK'
 
 def is_archive(fn):
     return is_rar(fn) or is_zip(fn)
