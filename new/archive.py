@@ -26,7 +26,9 @@ def is_zip(fn):
     return magic == b'PK'
 
 def is_archive(fn):
-    return is_rar(fn) or is_zip(fn)
+    ext_fn = os.path.splitext(fn)[-1].lower()
+
+    return ext_fn in (".rar", ".cbr", ".zip", ".cbz")
 
 def is_image(fn):
     ext_fn = os.path.splitext(fn)[-1].lower()
