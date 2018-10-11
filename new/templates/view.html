@@ -20,13 +20,32 @@ return Math.max(
     D.body.clientHeight, D.documentElement.clientHeight
     );
 }
+
+var atBottom = false;
+
+function jump_at_end(e) {
+    if (atBottom) {
+        window.location.href = '{{next_location}}';
+    }
+}
+
 $(function() {
     $('html').keydown(function(e) {
-        if ($(window).scrollTop() + $(window).height() >= getDocHeight() - 1 && (e.keyCode == 34 || e.keyCode == 32)) {
-            window.location.href = '{{next_location}}';
+        if (e.keyCode == 34 || e.keyCode == 32) {
+            jump_at_end();
         }
     });
 });
+
+$(document).bind('click', function() {
+    if (atBottom) { jump_at_end() }
+    window.scrollBy(0, window.innerHeight*0.75);
+});
+
+window.onscroll = function() {
+    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= getDocHeight();
+}
+
     </script>
 {% endblock %}
 
@@ -52,7 +71,7 @@ $(function() {
 {% block content %}
     {% for i in range(step) %}
         {% if pid+i < len(ar.fnlist) %}
-            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit" onclick="window.location.href = '{{next_location}}';">
+            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit">
         {% endif %}
     {% endfor %}
 {% endblock %}
