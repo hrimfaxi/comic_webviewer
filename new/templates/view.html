@@ -34,11 +34,11 @@ $(function() {
 <div class="navbar top">
     <div align=center style=\"padding: 4px;\">{{pid+1}} / {{len(ar.fnlist)}}<br>
     {% if pid > 0 %}
-        <a href="{{url_for('view', aid=aid, pid=pid-1, nowebp=nowebp)}}">Prev</a>
+        <a id=prev href="{{url_for('view', aid=aid, pid=pid-1, nowebp=nowebp)}}">Prev</a>
     {% endif %}
-    <a href="{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}">Up</a>
+    <a id=up href="{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}">Up</a>
     {% if pid+1 < len(ar.fnlist) %}
-        <a href="{{url_for('view', aid=aid, pid=pid+1, nowebp=nowebp)}}">Next</a>
+        <a id=next href="{{url_for('view', aid=aid, pid=pid+1, nowebp=nowebp)}}">Next</a>
     {% endif %}
     </div>
 </div>

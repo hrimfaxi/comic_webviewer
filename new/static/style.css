@@ -10,3 +10,19 @@ max-height: 100%;
 display: block;
 margin: auto;
 }
+
+#prev {
+    position:absolute;
+    left:0;
+    transform:translateX(200%);
+}
+
+#next {
+    position:absolute;
+    right:0;
+    transform:translateX(-200%);
+}
+
+#up {
+    font-size: 40px;
+}
