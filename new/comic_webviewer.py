@@ -57,8 +57,8 @@ def create_app(config):
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
             d = ar.read(pid)
-
-            if app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and request.args.get('nowebp', 0) != "1":
+            ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
+            if ext_fn != ".webp" and app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and request.args.get('nowebp', 0) != "1":
                 # convert into webp
                 # cwebp didn't support stdin/stdout, output to temp file
                 with tempfile.NamedTemporaryFile(prefix='comic_webviewer') as temp:
@@ -73,7 +73,7 @@ def create_app(config):
 
             res = make_response(d)
             res.headers.set('Cache-Control', 'max-age=3600')
-            res.headers.set('Content-Type', 'image/webp' if app.config['want_webp'] else 'image/jpeg')
+            res.headers.set('Content-Type', 'image/webp' if app.config['want_webp'] or ext_fn == ".webp" else 'image/jpeg')
             return res
     return app
 
