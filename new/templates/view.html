@@ -52,16 +52,16 @@ window.onscroll = function() {
 {% block navbar %}
 <div class="navbar top">
     <div align=center style=\"padding: 4px;\">
-    {% if step > 1 %}
-        {{pid+1}}-{{pid+step}} / {{len(ar.fnlist)}}<br>
+    {% if pid+1 != min(len(ar.fnlist), pid+step) %}
+        {{pid+1}}-{{min(len(ar.fnlist), pid+step)}} / {{len(ar.fnlist)}}<br>
     {% else %}
         {{pid+1}} / {{len(ar.fnlist)}}<br>
     {% endif %}
     {% if pid > 0 %}
-        <a id=prev href="{{url_for('view', aid=aid, pid=pid-step, nowebp=nowebp)}}">Prev</a>
+        <a id=prev href="{{url_for('view', aid=aid, pid=max(pid-step, 0), nowebp=nowebp)}}">Prev</a>
     {% endif %}
     <a id=up href="{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}">Up</a>
-    {% if pid+1 < len(ar.fnlist) %}
+    {% if pid+step < len(ar.fnlist) %}
         <a id=next href="{{url_for('view', aid=aid, pid=pid+step, nowebp=nowebp)}}">Next</a>
     {% endif %}
     </div>

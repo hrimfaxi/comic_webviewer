@@ -41,6 +41,8 @@ def create_app(config):
             fn = capp.archives[aid]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
+            if pid < 0 or pid >= len(ar.fnlist):
+                raise RuntimeError("insane pid: %d" % (pid));
             nowebp = int(request.args.get('nowebp', 0))
             step = app.config['step']
             if pid+step < len(ar.fnlist):
@@ -48,14 +50,15 @@ def create_app(config):
             else:
                 next_location = url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)
 
-            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, next_location=next_location, step=step, len=len)
+            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, next_location=next_location, step=step, len=len, min=min, max=max)
 
         @app.route('/image/<aid>')
         def image(aid):
-            pid = request.args.get('pid')
             fn = capp.archives[aid]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
+            if pid < 0 or pid >= len(ar.fnlist):
+                raise RuntimeError("insane pid: %d" % (pid));
             d = ar.read(pid)
             ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
             if ext_fn != ".webp" and app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and request.args.get('nowebp', 0) != "1":
