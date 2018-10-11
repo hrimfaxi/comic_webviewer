@@ -93,7 +93,7 @@ def main():
     config = parse.parse_args()
 
     app = create_app(vars(config))
-    logging.warning("listen on %s" % (config.address))
+    logging.warning("listen on %s:%d" % (config.address, config.port))
     app.run(debug=config.debug, host=config.address, port=config.port)
 
 if __name__ == "__main__":
