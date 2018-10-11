@@ -12,14 +12,6 @@ $(document).ready(function() {
     $(window).bind('resize', set_body_width);
     set_body_width();
 });
-function getDocHeight() {
-var D = document;
-return Math.max(
-    D.body.scrollHeight, D.documentElement.scrollHeight,
-    D.body.offsetHeight, D.documentElement.offsetHeight,
-    D.body.clientHeight, D.documentElement.clientHeight
-    );
-}
 
 var atBottom = false;
 
@@ -27,6 +19,11 @@ function jump_at_end(e) {
     if (atBottom) {
         window.location.href = '{{next_location}}';
     }
+}
+
+function scroll_down() {
+    if (atBottom) { jump_at_end() }
+    window.scrollBy(0, window.innerHeight*0.75);
 }
 
 $(function() {
@@ -38,12 +35,11 @@ $(function() {
 });
 
 $(document).bind('click', function() {
-    if (atBottom) { jump_at_end() }
-    window.scrollBy(0, window.innerHeight*0.75);
+    scroll_down();
 });
 
 window.onscroll = function() {
-    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= getDocHeight();
+    atBottom = window.innerHeight + Math.ceil(window.scrollY) >= document.body.offsetHeight - 5;
 }
 
     </script>
@@ -71,7 +67,7 @@ window.onscroll = function() {
 {% block content %}
     {% for i in range(step) %}
         {% if pid+i < len(ar.fnlist) %}
-            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit">
+            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit" onclicked="scroll_down();">
         {% endif %}
     {% endfor %}
 {% endblock %}
