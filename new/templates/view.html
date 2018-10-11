@@ -8,6 +8,16 @@
 function set_body_width() { // set body width = window width
     $('body').width($(window).width());
 }
+
+function getDocHeight() {
+var D = document;
+return Math.max(
+    D.body.scrollHeight, D.documentElement.scrollHeight,
+    D.body.offsetHeight, D.documentElement.offsetHeight,
+    D.body.clientHeight, D.documentElement.clientHeight
+    );
+}
+
 $(document).ready(function() {
     $(window).bind('resize', set_body_width);
     set_body_width();
@@ -35,7 +45,7 @@ $(document).bind('click', function() {
 });
 
 window.onscroll = function() {
-    atBottom = window.innerHeight + Math.ceil(window.scrollY) >= document.body.offsetHeight - 5;
+    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= getDocHeight() - 10;
 }
 
     </script>
