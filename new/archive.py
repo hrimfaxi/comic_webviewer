@@ -1,7 +1,8 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-import hashlib, os, zipfile, sys, locale, tools
+import hashlib, os, zipfile, sys, locale, tools, logging
+from collections import OrderedDict
 
 rarfile = None
 try:
@@ -41,9 +42,17 @@ def every_files_in_directory(directory):
         for name in files:
             yield os.path.join(root, name)
 
-def load(path):
-    return { hashlib.md5(fn.encode('utf-8')).hexdigest(): fn \
+def load(path, order='name', desc=False):
+    logging.warning("sorted by %s order%s" % (order, ", descending" if desc else ""))
+    r = { hashlib.md5(fn.encode('utf-8')).hexdigest(): { 'filename': fn, 'filesize' : os.stat(fn).st_size, 'mtime': os.stat(fn).st_mtime } \
             for fn in filter(is_archive, every_files_in_directory(path)) }
+    if order == 'name':
+        r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['filename'], reverse=desc))
+    elif order == 'time':
+        r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['mtime'], reverse=desc))
+    elif order == 'size':
+        r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['filesize'], reverse=desc))
+    return r
 
 class Archive(object):
     def __init__(self, path):

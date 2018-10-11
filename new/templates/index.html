@@ -4,6 +4,6 @@
 
 {% block content %}
     {% for e in archives %}
-    <ul><a id="{{e}}" href="{{url_for('archive_', aid=e)}}">{{basename(archives[e])}}</a></ul>
+    <ul><a id="{{e}}" href="{{url_for('archive_', aid=e, nowebp=nowebp)}}">{{basename(archives[e]['filename'])}}</a></ul>
     {% endfor %}
 {% endblock %}
