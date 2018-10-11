@@ -73,7 +73,7 @@ window.onscroll = function() {
 {% block content %}
     {% for i in range(step) %}
         {% if pid+i < len(ar.fnlist) %}
-            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit" onclicked="scroll_down();">
+            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit" onclicked="jump_at_end();">
         {% endif %}
     {% endfor %}
 {% endblock %}
