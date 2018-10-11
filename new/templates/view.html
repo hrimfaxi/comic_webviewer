@@ -32,22 +32,27 @@ $(function() {
 
 {% block navbar %}
 <div class="navbar top">
-    <div align=center style=\"padding: 4px;\">{{pid+1}} / {{len(ar.fnlist)}}<br>
+    <div align=center style=\"padding: 4px;\">
+    {% if step > 1 %}
+        {{pid+1}}-{{pid+step}} / {{len(ar.fnlist)}}<br>
+    {% else %}
+        {{pid+1}} / {{len(ar.fnlist)}}<br>
+    {% endif %}
     {% if pid > 0 %}
-        <a id=prev href="{{url_for('view', aid=aid, pid=pid-1, nowebp=nowebp)}}">Prev</a>
+        <a id=prev href="{{url_for('view', aid=aid, pid=pid-step, nowebp=nowebp)}}">Prev</a>
     {% endif %}
     <a id=up href="{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}">Up</a>
     {% if pid+1 < len(ar.fnlist) %}
-        <a id=next href="{{url_for('view', aid=aid, pid=pid+1, nowebp=nowebp)}}">Next</a>
+        <a id=next href="{{url_for('view', aid=aid, pid=pid+step, nowebp=nowebp)}}">Next</a>
     {% endif %}
     </div>
 </div>
 {% endblock %}
 
 {% block content %}
-    {% if pid+1 < len(ar.fnlist) %}
-    <img src="{{url_for('image', aid=aid, pid=pid, nowebp=nowebp)}}" class="center fit" onclick="window.location.href = '{{next_location}}';">
-    {% else %}
-    <img src="{{url_for('image', aid=aid, pid=pid, nowebp=nowebp)}}" class="center fit" onclick="window.location.href = '{{next_location}}';">
-    {% endif %}
+    {% for i in range(step) %}
+        {% if pid+i < len(ar.fnlist) %}
+            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit" onclick="window.location.href = '{{next_location}}';">
+        {% endif %}
+    {% endfor %}
 {% endblock %}

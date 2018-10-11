@@ -42,13 +42,13 @@ def create_app(config):
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
             nowebp = int(request.args.get('nowebp', 0))
-
-            if pid+1 < len(ar.fnlist):
-                next_location = url_for('view', aid=aid, pid=pid+1, nowebp=nowebp)
+            step = app.config['step']
+            if pid+step < len(ar.fnlist):
+                next_location = url_for('view', aid=aid, pid=pid+step, nowebp=nowebp)
             else:
                 next_location = url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)
 
-            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, next_location=next_location, len=len)
+            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, next_location=next_location, step=step, len=len)
 
         @app.route('/image/<aid>')
         def image(aid):
@@ -77,6 +77,12 @@ def create_app(config):
             return res
     return app
 
+def step_type(x):
+    x = int(x)
+    if x <= 0:
+        raise argparse.ArgumentTypeError("Must be greater than 0")
+    return x
+
 def main():
     parse = argparse.ArgumentParser(description='comic webviewer')
     parse.add_argument('--debug', '-d', action='store_true', help='debug mode')
@@ -90,6 +96,7 @@ def main():
     parse.add_argument('--disable-webp', action='store_true', help='disable webp mode')
     parse.add_argument('--port', '-p', type=int, default=5001, help='port to listen on, default: 5001')
     parse.add_argument('--address', '-a', default='127.0.0.1', help='listen address, default: 127.0.0.1')
+    parse.add_argument('--step', type=step_type, default=1, help='specify how many image(s) in one view')
     config = parse.parse_args()
 
     app = create_app(vars(config))
