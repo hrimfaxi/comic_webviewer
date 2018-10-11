@@ -24,5 +24,6 @@ margin: auto;
 }
 
 #up {
+    align=center;
     font-size: 40px;
 }
