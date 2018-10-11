@@ -19,10 +19,6 @@ function jump_at_end(e) {
     if (atBottom) {
         window.location.href = '{{next_location}}';
     }
-}
-
-function scroll_down() {
-    if (atBottom) { jump_at_end() }
     window.scrollBy(0, window.innerHeight*0.75);
 }
 
@@ -35,7 +31,7 @@ $(function() {
 });
 
 $(document).bind('click', function() {
-    scroll_down();
+    jump_at_end();
 });
 
 window.onscroll = function() {
