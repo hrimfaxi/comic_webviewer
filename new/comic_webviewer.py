@@ -41,22 +41,20 @@ def create_app(config):
             fn = capp.archives[aid]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
+            width = int(request.args.get('width', 1080))
             if pid < 0 or pid >= len(ar.fnlist):
                 raise RuntimeError("insane pid: %d" % (pid));
             nowebp = int(request.args.get('nowebp', 0))
             step = app.config['step']
-            if pid+step < len(ar.fnlist):
-                next_location = url_for('view', aid=aid, pid=pid+step, nowebp=nowebp)
-            else:
-                next_location = url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)
 
-            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, next_location=next_location, step=step, len=len, min=min, max=max)
+            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, step=step, width=width, len=len, min=min, max=max)
 
         @app.route('/image/<aid>')
         def image(aid):
             fn = capp.archives[aid]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
+            width = int(request.args.get('width', 1080))
             if pid < 0 or pid >= len(ar.fnlist):
                 raise RuntimeError("insane pid: %d" % (pid));
             d = ar.read(pid)
@@ -68,7 +66,7 @@ def create_app(config):
                     temp.write(d)
                     temp.flush()
                     null = open(os.devnull, 'wb')
-                    cwebp_cmd = [CWEBP_PATH, '-mt', '-resize', '1080', '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
+                    cwebp_cmd = [CWEBP_PATH, '-mt', '-resize', '%d' % (width), '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
                     logging.warning(cwebp_cmd)
                     p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
                     stdout, _ = p.communicate()

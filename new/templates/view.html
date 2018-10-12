@@ -22,15 +22,15 @@ function jump_at_top(e) {
         {% if pid == 0 %}
             '{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}'
         {% else %}
-            '{{url_for('view', aid=aid, pid=max(pid-step, 0), nowebp=nowebp)}}'
+            '{{url_for('view', aid=aid, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}'
         {% endif %}
-        ;
+        .replace(/&amp;/g, "&");
     }
 }
 
 function jump_at_bottom(e) {
     if (atBottom) {
-        window.location.href = '{{next_location}}';
+        window.location.href = "{{ url_for('view', aid=aid, pid=pid+step, nowebp=nowebp, width=width) if pid+step < len(ar.fnlist) else url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp, width=width)}}".replace(/&amp;/g, "&");
     }
 }
 
@@ -78,11 +78,11 @@ window.onscroll = update_bottom;
         {{pid+1}} / {{len(ar.fnlist)}}<br>
     {% endif %}
     {% if pid > 0 %}
-        <a id=prev href="{{url_for('view', aid=aid, pid=max(pid-step, 0), nowebp=nowebp)}}">Prev</a>
+        <a id=prev href="{{url_for('view', aid=aid, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}">Prev</a>
     {% endif %}
-    <a id=up href="{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}">Up</a>
+    <a id=up href="{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp, width=width)}}">Up</a>
     {% if pid+step < len(ar.fnlist) %}
-        <a id=next href="{{url_for('view', aid=aid, pid=pid+step, nowebp=nowebp)}}">Next</a>
+        <a id=next href="{{url_for('view', aid=aid, pid=pid+step, nowebp=nowebp, width=width)}}">Next</a>
     {% endif %}
     </div>
 </div>
@@ -91,7 +91,7 @@ window.onscroll = update_bottom;
 {% block content %}
     {% for i in range(step) %}
         {% if pid+i < len(ar.fnlist) %}
-            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit">
+            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp, width=width)}}" class="center fit">
         {% endif %}
     {% endfor %}
 {% endblock %}
