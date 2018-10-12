@@ -9,44 +9,62 @@ function set_body_width() { // set body width = window width
     $('body').width($(window).width());
 }
 
-function getDocHeight() {
-var D = document;
-return Math.max(
-    D.body.scrollHeight, D.documentElement.scrollHeight,
-    D.body.offsetHeight, D.documentElement.offsetHeight,
-    D.body.clientHeight, D.documentElement.clientHeight
-    );
-}
-
 $(document).ready(function() {
     $(window).bind('resize', set_body_width);
     set_body_width();
 });
 
-var atBottom = false;
+var atTop = false, atBottom = false;
 
-function jump_at_end(e) {
+function jump_at_top(e) {
+    if (atTop) {
+        window.location.href =
+        {% if pid == 0 %}
+            '{{url_for('archive_', aid=aid, _anchor=aid, nowebp=nowebp)}}'
+        {% else %}
+            '{{url_for('view', aid=aid, pid=max(pid-step, 0), nowebp=nowebp)}}'
+        {% endif %}
+        ;
+    }
+}
+
+function jump_at_bottom(e) {
     if (atBottom) {
         window.location.href = '{{next_location}}';
     }
-    window.scrollBy(0, window.innerHeight*0.75);
+}
+
+function update_top() {
+    atTop = $(window).scrollTop() == 0;
+}
+
+function update_bottom() {
+    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= document.body.scrollHeight;
 }
 
 $(function() {
     $('html').keydown(function(e) {
         if (e.keyCode == 34 || e.keyCode == 32) {
-            jump_at_end();
+            jump_at_bottom();
+            update_bottom();
         }
     });
 });
 
-$(document).bind('click', function() {
-    jump_at_end();
+$(document).bind('click', function(e) {
+    step_size = window.innerHeight*0.75;
+    if (e.clientX >= window.innerWidth * 0.5) {
+        jump_at_bottom();
+        window.scrollBy(0, step_size);
+        update_bottom();
+    } else {
+        jump_at_top();
+        window.scrollBy(0, -step_size);
+        update_top();
+    }
 });
 
-window.onscroll = function() {
-    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= getDocHeight() - 10;
-}
+window.onscroll = update_bottom;
 
     </script>
 {% endblock %}
@@ -73,7 +91,7 @@ window.onscroll = function() {
 {% block content %}
     {% for i in range(step) %}
         {% if pid+i < len(ar.fnlist) %}
-            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit" onclicked="jump_at_end();">
+            <img src="{{url_for('image', aid=aid, pid=pid+i, nowebp=nowebp)}}" class="center fit">
         {% endif %}
     {% endfor %}
 {% endblock %}
