@@ -39,7 +39,7 @@ function update_top() {
 }
 
 function update_bottom() {
-    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= document.body.scrollHeight;
+    atBottom = $(window).height() + Math.ceil($(window).scrollTop()) >= document.body.scrollHeight - 5;
 }
 
 $(function() {
@@ -53,7 +53,7 @@ $(function() {
 
 $(document).bind('click', function(e) {
     step_size = window.innerHeight*0.75;
-    if (e.clientX >= window.innerWidth * 0.5) {
+    if (e.clientY >= window.innerHeight * 0.5) {
         jump_at_bottom();
         window.scrollBy(0, step_size);
         update_bottom();
