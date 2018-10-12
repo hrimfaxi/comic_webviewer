@@ -91,7 +91,7 @@ def step_type(x):
 def main():
     parse = argparse.ArgumentParser(description='comic webviewer')
     parse.add_argument('--debug', '-d', action='store_true', help='debug mode')
-    parse.add_argument('--sort', '-s', choices=['name', 'time', 'size'], default='name', help='archive display order')
+    parse.add_argument('--sort', '-s', choices=['name', 'time', 'size', 'random'], default='name', help='archive display order')
     parse.add_argument('--reverse', '-r', action='store_true', help='reversed sort order')
     parse.add_argument('--webp-quality', '-c', type=int, default=5, help='webp quaility [0-100], default: 5')
     parse.add_argument('--webp-preset', choices=[

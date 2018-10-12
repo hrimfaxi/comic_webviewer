@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-import hashlib, os, zipfile, sys, locale, tools, logging
+import hashlib, os, zipfile, sys, locale, tools, logging, random
 from collections import OrderedDict
 
 rarfile = None
@@ -52,6 +52,11 @@ def load(path, order='name', desc=False):
         r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['mtime'], reverse=desc))
     elif order == 'size':
         r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['filesize'], reverse=desc))
+    elif order == 'random':
+        x = list(r.items())
+        random.shuffle(x)
+        r = OrderedDict(x)
+
     return r
 
 class Archive(object):
