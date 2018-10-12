@@ -76,7 +76,10 @@ $(document).bind('click', function(e) {
     }
 });
 
-window.onscroll = update_bottom;
+window.onscroll = function() {
+    update_top();
+    update_bottom();
+}
 
     </script>
 {% endblock %}
