@@ -68,7 +68,9 @@ def create_app(config):
                     temp.write(d)
                     temp.flush()
                     null = open(os.devnull, 'wb')
-                    p = subprocess.Popen([CWEBP_PATH, '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-'], stderr=null, stdout=subprocess.PIPE)
+                    cwebp_cmd = [CWEBP_PATH, '-mt', '-resize', '1080', '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
+                    logging.warning(cwebp_cmd)
+                    p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
                     stdout, _ = p.communicate()
                     logging.warning('webp compressed: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
                     d = stdout
