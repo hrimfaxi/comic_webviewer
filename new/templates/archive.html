@@ -7,8 +7,9 @@
         <script type="text/javascript" language="JavaScript">
             $(document).ready(function() {
                 width = window.innerWidth;
+                height = window.innerHeight;
                 $('a.imglink').each(function(o) {
-                    $(this).attr("href", $(this).attr("href") + '&width=' + width);
+                    $(this).attr("href", $(this).attr("href") + '&width=' + Math.max(width, height));
                 });
             });
         </script>
