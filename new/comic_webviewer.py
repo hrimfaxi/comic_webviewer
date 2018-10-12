@@ -22,9 +22,9 @@ def create_app(config):
         def index():
             nowebp = int(request.args.get('nowebp', 0))
             timestamp = os.stat(".").st_mtime
-            if capp.path_timestamp < timestamp:
+            if app.config['sort'] == 'random' or capp.path_timestamp < timestamp:
                 # Reloading
-                capp.archives = archive.load(".")
+                capp.archives = archive.load(".", app.config['sort'], app.config['reverse'])
                 capp.path_timestamp = timestamp
             return render_template("index.html", archives=capp.archives, basename=os.path.basename, nowebp=nowebp)
 
