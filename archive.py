@@ -86,3 +86,5 @@ class Archive(object):
             return f.read(self.fnlist[pid])
 
         raise RuntimeError("Cannot open rar: please install python-rarfile")
+
+# vim: set tabstop=4 sw=4 expandtab:

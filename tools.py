@@ -41,4 +41,4 @@ def garbage_collect():
     else:
         gc.collect()
 
-# vim: expandtab:sw=4:ts=4
+# vim: expandtab sw=4 ts=4:
