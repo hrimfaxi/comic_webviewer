@@ -16,8 +16,8 @@ def _format_substring(s):
         " 转化为数字 "
         return int(s)
 
-    " 返回小写形式 "
-    return s.lower()
+    " 返回UTF-8编码后16进制数字形式 "
+    return int(s.encode("utf-8").hex(), 16)
 
 " 基于数字排序 "
 def alphanumeric_sort(filenames):
