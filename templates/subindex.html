@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Webviewer{% endblock %}
+
+{% block content %}
+    {% for e in archives[2] %}
+    <ul><a id="{{e}}" href="{{url_for('archive_', aid=aid, fhash=e, nowebp=nowebp)}}">{{basename(archives[2][e]['filename'])}}</a></ul>
+    {% endfor %}
+{% endblock %}

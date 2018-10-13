@@ -19,12 +19,12 @@
 {% block content %}
         <h1>{{basename(fn)}}</h1>
         {% for pid, e in enumerate(archive.fnlist) %}
-        <ul><a class="imglink" id="{{e}}" href="{{url_for('view', aid=aid, pid=pid, nowebp=nowebp)}}">{{e}}</a></ul>
+        <ul><a class="imglink" id="{{e}}" href="{{url_for('view', aid=aid, fhash=fhash, pid=pid, nowebp=nowebp)}}">{{e}}</a></ul>
         {% endfor %}
 {% endblock %}
 
 {% block navbar %}
 <nav class="navbar fixed-bottom">
-    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('index', _anchor=aid, nowebp=nowebp)}} ">Up</a></div><p>
+    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('index', aid=aid, _anchor=fhash, nowebp=nowebp)}} ">Up</a></div><p>
 </div>
 {% endblock %}

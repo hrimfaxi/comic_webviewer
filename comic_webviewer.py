@@ -1,34 +1,11 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-from flask import Flask, render_template, request, make_response, url_for
+from flask import Flask, render_template, request, make_response, url_for, redirect
 from flask import current_app as capp
 import argparse, os, archive, subprocess, tempfile, logging, shutil, argparse
 
 CWEBP_PATH = shutil.which('cwebp')
-
-def make_image(app, ar, pid, width):
-    d = ar.read(pid)
-    ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
-    if ext_fn != ".webp" and app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and request.args.get('nowebp', 0) != "1":
-        # convert into webp
-        # cwebp didn't support stdin/stdout, output to temp file
-        with tempfile.NamedTemporaryFile(prefix='comic_webviewer') as temp:
-            temp.write(d)
-            temp.flush()
-            null = open(os.devnull, 'wb')
-            cwebp_cmd = [CWEBP_PATH, '-mt', '-resize', '%d' % (width), '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
-            logging.warning(cwebp_cmd)
-            p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
-            stdout, _ = p.communicate()
-            logging.warning('webp compressed: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
-            d = stdout
-            del null, p
-
-    res = make_response(d)
-    res.headers.set('Cache-Control', 'max-age=3600')
-    res.headers.set('Content-Type', 'image/webp' if app.config['want_webp'] or ext_fn == ".webp" else 'image/jpeg')
-    return res
 
 def create_app(config):
     app = Flask(__name__)
@@ -38,30 +15,35 @@ def create_app(config):
         if app.config['disable_webp'] is False and CWEBP_PATH is not None:
             logging.warning("webp enabled, quality: %d, preset: %s" % (app.config['webp_quality'], app.config['webp_preset']))
             app.config['want_webp'] = True
-        capp.archives = archive.load(".", app.config['sort'], app.config['reverse'])
-        capp.path_timestamp = os.stat(".").st_mtime
+        capp.archives = [ [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ] for dirname in app.config['directories'] ]
 
         @app.route('/')
         def index():
             nowebp = int(request.args.get('nowebp', 0))
-            timestamp = os.stat(".").st_mtime
-            if app.config['sort'] == 'random' or capp.path_timestamp < timestamp:
-                # Reloading
-                capp.archives = archive.load(".", app.config['sort'], app.config['reverse'])
-                capp.path_timestamp = timestamp
             return render_template("index.html", archives=capp.archives, basename=os.path.basename, nowebp=nowebp)
 
-        @app.route('/archive/<aid>')
-        def archive_(aid):
+        @app.route('/<int:aid>/')
+        def subindex(aid):
             nowebp = int(request.args.get('nowebp', 0))
-            fn = capp.archives[aid]['filename']
+            dirname = capp.archives[aid][0]
+            timestamp = os.stat(dirname).st_mtime
+            if app.config['sort'] == 'random' or capp.archives[aid][1] < timestamp:
+                # Reloading
+                capp.archives = [ [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ] for dirname in app.config['directories'] ]
+                capp.archives[aid][1] = timestamp
+            return render_template("subindex.html", aid=aid, archives=capp.archives[aid], basename=os.path.basename, nowebp=nowebp)
+
+        @app.route('/archive/<int:aid>/<fhash>')
+        def archive_(aid, fhash):
+            nowebp = int(request.args.get('nowebp', 0))
+            fn = capp.archives[aid][2][fhash]['filename']
             ar = archive.Archive(fn)
 
-            return render_template("archive.html", aid=aid, fn=fn, archive=ar, basename=os.path.basename, enumerate=enumerate, nowebp=nowebp)
+            return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar, nowebp=nowebp, basename=os.path.basename, enumerate=enumerate)
 
-        @app.route('/view/<aid>')
-        def view(aid):
-            fn = capp.archives[aid]['filename']
+        @app.route('/view/<int:aid>/<fhash>')
+        def view(aid, fhash):
+            fn = capp.archives[aid][2][fhash]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
             width = int(request.args.get('width', 1080))
@@ -70,11 +52,34 @@ def create_app(config):
             nowebp = int(request.args.get('nowebp', 0))
             step = app.config['step']
 
-            return render_template("view.html", ar=ar, aid=aid, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, step=step, width=width, len=len, min=min, max=max)
+            return render_template("view.html", ar=ar, aid=aid, fhash=fhash, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, step=step, width=width, len=len, min=min, max=max)
 
-        @app.route('/thumbnail/<aid>')
-        def thumbnail(aid):
-            fn = capp.archives[aid]['filename']
+        def make_image(app, ar, pid, width):
+            d = ar.read(pid)
+            ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
+            if ext_fn != ".webp" and app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and request.args.get('nowebp', 0) != "1":
+                # convert into webp
+                # cwebp didn't support stdin/stdout, output to temp file
+                with tempfile.NamedTemporaryFile(prefix='comic_webviewer') as temp:
+                    temp.write(d)
+                    temp.flush()
+                    null = open(os.devnull, 'wb')
+                    cwebp_cmd = [CWEBP_PATH, '-mt', '-resize', '%d' % (width), '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
+                    logging.warning(cwebp_cmd)
+                    p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
+                    stdout, _ = p.communicate()
+                    logging.warning('webp compressed: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
+                    d = stdout
+                    del null, p
+
+            res = make_response(d)
+            res.headers.set('Cache-Control', 'max-age=3600')
+            res.headers.set('Content-Type', 'image/webp' if app.config['want_webp'] or ext_fn == ".webp" else 'image/jpeg')
+            return res
+
+        @app.route('/thumbnail/<int:aid>/<fhash>')
+        def thumbnail(aid, fhash):
+            fn = capp.archives[aid][2][fhash]['filename']
             ar = archive.Archive(fn)
             pid = 0
             width = int(request.args.get('width', 128))
@@ -83,9 +88,9 @@ def create_app(config):
             nowebp = int(request.args.get('nowebp', 0))
             return make_image(app, ar, pid, width)
 
-        @app.route('/image/<aid>')
-        def image(aid):
-            fn = capp.archives[aid]['filename']
+        @app.route('/image/<int:aid>/<fhash>')
+        def image(aid, fhash):
+            fn = capp.archives[aid][2][fhash]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
             width = int(request.args.get('width', 1080))
@@ -115,6 +120,7 @@ def main():
     parse.add_argument('--port', '-p', type=int, default=5001, help='port to listen on, default: 5001')
     parse.add_argument('--address', '-a', default='127.0.0.1', help='listen address, default: 127.0.0.1')
     parse.add_argument('--step', type=step_type, default=1, help='specify how many image(s) in one view')
+    parse.add_argument("directories", nargs="+", help="directory names to serve")
     config = parse.parse_args()
 
     app = create_app(vars(config))
