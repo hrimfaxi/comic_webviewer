@@ -11,53 +11,57 @@ def create_app(config):
     app = Flask(__name__)
     app.config.update(config)
     with app.app_context():
+        DIRNAME = 0
+        MTIME   = 1
+        ARCHIVE = 2
+
         app.config['want_webp'] = False
         if app.config['disable_webp'] is False and CWEBP_PATH is not None:
             logging.warning("webp enabled, quality: %d, preset: %s" % (app.config['webp_quality'], app.config['webp_preset']))
             app.config['want_webp'] = True
-        capp.archives = [ [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ] for dirname in app.config['directories'] ]
+        capp.repo = [ [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ] for dirname in app.config['directories'] ]
+
+        @app.context_processor
+        def inject_config():
+            return dict(nowebp=int(request.args.get('nowebp', 0)), width = int(request.args.get('width', 1080)),
+                    basename=os.path.basename, sep=os.path.sep,
+                    enumerate=enumerate, len=len, min=min, max=max, repo=capp.repo, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
 
         @app.route('/')
         def index():
-            nowebp = int(request.args.get('nowebp', 0))
-            return render_template("index.html", archives=capp.archives, basename=os.path.basename, nowebp=nowebp)
+            return render_template("index.html")
 
         @app.route('/<int:aid>/')
         def subindex(aid):
-            nowebp = int(request.args.get('nowebp', 0))
-            dirname = capp.archives[aid][0]
+            dirname = capp.repo[aid][DIRNAME]
             timestamp = os.stat(dirname).st_mtime
-            if app.config['sort'] == 'random' or capp.archives[aid][1] < timestamp:
+            if app.config['sort'] == 'random' or capp.repo[aid][MTIME] < timestamp:
                 # Reloading
-                capp.archives = [ [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ] for dirname in app.config['directories'] ]
-                capp.archives[aid][1] = timestamp
-            return render_template("subindex.html", aid=aid, archives=capp.archives[aid], basename=os.path.basename, nowebp=nowebp)
+                capp.repo[aid] = [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ]
+            return render_template("subindex.html", aid=aid, archives=capp.repo[aid])
 
         @app.route('/archive/<int:aid>/<fhash>')
         def archive_(aid, fhash):
-            nowebp = int(request.args.get('nowebp', 0))
-            fn = capp.archives[aid][2][fhash]['filename']
+            fn = capp.repo[aid][ARCHIVE][fhash]['filename']
             ar = archive.Archive(fn)
 
-            return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar, nowebp=nowebp, basename=os.path.basename, enumerate=enumerate)
+            return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar)
 
         @app.route('/view/<int:aid>/<fhash>')
         def view(aid, fhash):
-            fn = capp.archives[aid][2][fhash]['filename']
-            ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
-            width = int(request.args.get('width', 1080))
+            fn = capp.repo[aid][ARCHIVE][fhash]['filename']
+            ar = archive.Archive(fn)
             if pid < 0 or pid >= len(ar.fnlist):
                 raise RuntimeError("insane pid: %d" % (pid))
-            nowebp = int(request.args.get('nowebp', 0))
             step = app.config['step']
 
-            return render_template("view.html", ar=ar, aid=aid, fhash=fhash, pid=pid, nowebp=nowebp, fn=fn, archive=ar, basename=os.path.basename, step=step, width=width, len=len, min=min, max=max)
+            return render_template("view.html", ar=ar, aid=aid, fhash=fhash, pid=pid, fn=fn, archive=ar, step=step, width=width)
 
         def make_image(app, ar, pid, width):
             d = ar.read(pid)
             ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
-            if ext_fn != ".webp" and app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and request.args.get('nowebp', 0) != "1":
+            if ext_fn != ".webp" and app.config['want_webp'] and 'image/webp' in request.headers['accept'].split(',') and int(request.args.get('nowebp', 0)) != 1:
                 # convert into webp
                 # cwebp didn't support stdin/stdout, output to temp file
                 with tempfile.NamedTemporaryFile(prefix='comic_webviewer') as temp:
@@ -79,18 +83,17 @@ def create_app(config):
 
         @app.route('/thumbnail/<int:aid>/<fhash>')
         def thumbnail(aid, fhash):
-            fn = capp.archives[aid][2][fhash]['filename']
+            fn = capp.repo[aid][ARCHIVE][fhash]['filename']
             ar = archive.Archive(fn)
             pid = 0
             width = int(request.args.get('width', 128))
             if len(ar.fnlist) == 0:
                 raise RuntimeError("empty archive")
-            nowebp = int(request.args.get('nowebp', 0))
             return make_image(app, ar, pid, width)
 
         @app.route('/image/<int:aid>/<fhash>')
         def image(aid, fhash):
-            fn = capp.archives[aid][2][fhash]['filename']
+            fn = capp.repo[aid][ARCHIVE][fhash]['filename']
             ar = archive.Archive(fn)
             pid = int(request.args.get('pid'))
             width = int(request.args.get('width', 1080))
