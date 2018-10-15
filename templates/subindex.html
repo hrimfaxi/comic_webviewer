@@ -7,3 +7,9 @@
     <ul><a id="{{e}}" href="{{url_for('archive_', aid=aid, fhash=e, nowebp=nowebp)}}">{{basename(archives[2][e]['filename'])}}</a></ul>
     {% endfor %}
 {% endblock %}
+
+{% block navbar %}
+<nav class="navbar fixed-bottom">
+    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('index', aid=aid, _anchor=fhash, nowebp=nowebp)}} ">Up</a></div><p>
+</div>
+{% endblock %}
