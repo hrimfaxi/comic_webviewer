@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Webviewer{% endblock %}
+
+{% block content %}
+    {% for k, v in archives[ARCHIVE].items() %}
+        <ul><a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, nowebp=nowebp)}}">{{v['filename'] | strip_path}}</a></ul>
+    {% endfor %}
+{% endblock %}
+
+{% block navbar %}
+<nav class="navbar fixed-bottom">
+    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
+</div>
+{% endblock %}

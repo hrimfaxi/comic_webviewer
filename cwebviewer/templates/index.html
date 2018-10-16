@@ -1,0 +1,9 @@
+{% extends "base.html" %}
+
+{% block title %}Comic Webviewer{% endblock %}
+
+{% block content %}
+    {% for e in app.repo %}
+    <ul><a id="{{e}}" href="{{url_for('.subindex', aid=loop.index0, nowebp=nowebp)}}">{{loop.index}}: {{e[0]}} </a></ul>
+    {% endfor %}
+{% endblock %}

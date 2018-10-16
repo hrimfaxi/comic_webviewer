@@ -1,13 +1,13 @@
 {% macro link_archive() -%}
-    {{url_for('archive_', aid=aid, fhash=fhash, _anchor=fhash, nowebp=nowebp)}}
+    {{url_for('.archive_', aid=aid, fhash=fhash, _anchor=fhash, nowebp=nowebp)}}
 {%- endmacro %}
 
 {% macro link_next() -%}
-    {{url_for('view', aid=aid, fhash=fhash, pid=pid+step, nowebp=nowebp, width=width)}}
+    {{url_for('.view', aid=aid, fhash=fhash, pid=pid+step, nowebp=nowebp, width=width)}}
 {%- endmacro %}
 
 {% macro link_prev() -%}
-    {{url_for('view', aid=aid, fhash=fhash, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}
+    {{url_for('.view', aid=aid, fhash=fhash, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}
 {%- endmacro %}
 
 {% macro progress_bar(ar, pid, step) -%}
@@ -110,7 +110,7 @@ window.onscroll = function() {
 {% block content %}
     {% for i in range(step) %}
         {% if pid+i < len(ar.fnlist) %}
-            <img src="{{url_for('image', aid=aid, fhash=fhash, pid=pid+i, nowebp=nowebp, width=width)}}" class="center fit">
+            <img src="{{url_for('.image', aid=aid, fhash=fhash, pid=pid+i, nowebp=nowebp, width=width)}}" class="center fit">
         {% endif %}
     {% endfor %}
 {% endblock %}
