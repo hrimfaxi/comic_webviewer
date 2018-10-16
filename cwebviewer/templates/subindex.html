@@ -1,10 +1,18 @@
 {% extends "base.html" %}
 
+{% macro link_next_page() -%}
+    {{url_for('.subindex', aid=aid, page=page+1, nowebp=nowebp, width=width)}}
+{%- endmacro %}
+
+{% macro link_prev_page() -%}
+    {{url_for('.subindex', aid=aid, page=page-1, nowebp=nowebp, width=width)}}
+{%- endmacro %}
+
 {% block title %}Comic Webviewer{% endblock %}
 
 {% block content %}
     <table>
-    {% for k, v in archives[ARCHIVE].items() %}
+    {% for k, v in islice(archives[ARCHIVE].items(), page*10, page*10+10) %}
         <tr>
             <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, nowebp=nowebp)}}"><img src="{{url_for(".thumbnail", aid=aid, fhash=k, nowebp=nowebp)}}"></a> </td>
             <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, nowebp=nowebp)}}">{{v['filename'] | strip_path}}</td>
@@ -15,6 +23,12 @@
 
 {% block navbar %}
 <nav class="navbar fixed-bottom">
-    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
 </div>
+    {% if page > 0 %}
+        <a id=prev href="{{link_prev_page()}}">Prev</a>
+    {% endif %}
+    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
+    {% if page*10+10 < len(archives[ARCHIVE]) %}
+        <a id=next href="{{link_next_page()}}">Next</a>
+    {% endif %}
 {% endblock %}

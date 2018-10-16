@@ -6,6 +6,7 @@ from flask import current_app as app
 from . import archive
 from .consts import *
 from .models import *
+from itertools import islice
 
 cwebviewer_pages = Blueprint('cwebviewer', __name__)
 
@@ -14,9 +15,10 @@ def index():
     return render_template("index.html")
 
 @cwebviewer_pages.route('/<int:aid>/')
-def subindex(aid):
+@cwebviewer_pages.route('/<int:aid>/<int:page>')
+def subindex(aid, page=0):
     reload_repo_by_mtime(aid)
-    return render_template("subindex.html", aid=aid, archives=app.repo[aid])
+    return render_template("subindex.html", aid=aid, archives=app.repo[aid], page=page, islice=islice)
 
 @cwebviewer_pages.route('/archive/<int:aid>/<fhash>')
 def archive_(aid, fhash):
