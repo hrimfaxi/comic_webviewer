@@ -3,7 +3,7 @@
 
 from flask import Flask, render_template, request, make_response, url_for, redirect
 from flask import current_app as capp
-import argparse, os, archive, subprocess, tempfile, logging, shutil, argparse
+import argparse, os, archive, subprocess, tempfile, shutil, argparse
 
 CWEBP_PATH = shutil.which('cwebp')
 CWEBP_EXTRA_OPTIONS = [ '-mt' ]
@@ -18,9 +18,12 @@ def create_app(config):
 
         app.config['want_webp'] = False
         if app.config['disable_webp'] is False and CWEBP_PATH is not None:
-            logging.warning("webp enabled, quality: %d, preset: %s" % (app.config['webp_quality'], app.config['webp_preset']))
+            app.logger.warning("webp enabled, quality: %d, preset: %s" % (app.config['webp_quality'], app.config['webp_preset']))
             app.config['want_webp'] = True
+        app.logger.warning("sorted by %s order%s" % (app.config['sort'], ", descending" if app.config['reverse'] else ""))
         capp.repo = [ [ dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['sort'], app.config['reverse']) ] for dirname in app.config['directories'] ]
+        for e in capp.repo:
+            app.logger.warning("Directory %s: %d archvies loaded." % (e[DIRNAME], len(e[ARCHIVE])))
 
         @app.context_processor
         def inject_config():
@@ -68,10 +71,10 @@ def create_app(config):
                     temp.flush()
                     null = open(os.devnull, 'wb')
                     cwebp_cmd = [ CWEBP_PATH ] + CWEBP_EXTRA_OPTIONS + [ '-resize', '%d' % (width), '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
-                    logging.warning(cwebp_cmd)
+                    app.logger.warning(cwebp_cmd)
                     p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
                     stdout, _ = p.communicate()
-                    logging.warning('webp compressed: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
+                    app.logger.warning('webp compressed: %d/%d %f%%' % (len(stdout), len(d), 100.0 * len(stdout) / len(d)))
                     d = stdout
                     del null, p
 
@@ -125,7 +128,7 @@ def main():
     config = parse.parse_args()
 
     app = create_app(vars(config))
-    logging.warning("listen on %s:%d" % (config.address, config.port))
+    app.logger.warning("listen on %s:%d" % (config.address, config.port))
     app.run(debug=config.debug, host=config.address, port=config.port)
 
 if __name__ == "__main__":
