@@ -44,19 +44,9 @@ def make_image_response(data):
     res.headers.set('Content-Type', 'image/webp' if app.config['WANT_WEBP'] or ext_fn == ".webp" else 'image/jpeg')
     return res
 
-@cwebviewer_pages.route('/thumbnail/<int:aid>/<fhash>')
-def thumbnail(aid, fhash):
-    fn = app.repo[aid][ARCHIVE][fhash]['filename']
-    ar = archive.Archive(fn)
-    pid = 0
-    width = int(request.args.get('width', 512))
-    if len(ar.fnlist) == 0:
-        raise RuntimeError("empty archive")
-    d = make_image(ar, pid, width, 'image/webp' in request.headers['accept'].split(',') and int(request.args.get('nowebp', 0)) != 1)
-    return make_image_response(d)
-
+@cwebviewer_pages.route('/image/<int:aid>/<fhash>')
 @cwebviewer_pages.route('/image/<int:aid>/<fhash>/<int:pid>')
-def image(aid, fhash, pid):
+def image(aid, fhash, pid=0):
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
     ar = archive.Archive(fn)
     if pid < 0 or pid >= len(ar.fnlist):
