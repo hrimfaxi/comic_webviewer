@@ -10,12 +10,20 @@
     {{url_for('view', aid=aid, fhash=fhash, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}
 {%- endmacro %}
 
+{% macro progress_bar(ar, pid, step) -%}
+    {% if pid+1 != min(len(ar.fnlist), pid+step) %}
+        {{pid+1}}-{{min(len(ar.fnlist), pid+step)}} / {{len(ar.fnlist)}}
+    {% else %}
+        {{pid+1}} / {{ar.fnlist | length}}
+    {% endif %}
+{%- endmacro %}
+
 {% extends "base.html" %}
 
-{% block title %}{{basename(fn)}} - {{ar.fnlist[pid]}} - [{{pid+1}} / {{len(ar.fnlist)}}]{% endblock %}
+{% block title %}{{basename(fn)}} - {{ar.fnlist[pid]}} - [{{progress_bar(ar, pid, step)}}]{% endblock %}
 
 {% block scripts %}
-    <script src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
     <script type="text/javascript" language="JavaScript">
 function set_body_width() { // set body width = window width
     $('body').width($(window).width());
@@ -87,11 +95,7 @@ window.onscroll = function() {
 {% block navbar %}
 <div class="navbar top">
     <div align=center style=\"padding: 4px;\">
-    {% if pid+1 != min(len(ar.fnlist), pid+step) %}
-        {{pid+1}}-{{min(len(ar.fnlist), pid+step)}} / {{len(ar.fnlist)}}<br>
-    {% else %}
-        {{pid+1}} / {{len(ar.fnlist)}}<br>
-    {% endif %}
+    {{progress_bar(ar, pid, step)}}<br>
     {% if pid > 0 %}
         <a id=prev href="{{link_prev()}}">Prev</a>
     {% endif %}

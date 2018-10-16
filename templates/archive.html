@@ -3,7 +3,7 @@
 {% block title %}{{basename(fn)}}{% endblock %}
 
 {% block scripts %}
-        <script src="{{ url_for('static', filename='jquery-3.3.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
         <script type="text/javascript" language="JavaScript">
             $(document).ready(function() {
                 width = $(window).width();
@@ -18,8 +18,8 @@
 
 {% block content %}
         <h1>{{basename(fn)}}</h1>
-        {% for pid, e in enumerate(archive.fnlist) %}
-        <ul><a class="imglink" id="{{e}}" href="{{url_for('view', aid=aid, fhash=fhash, pid=pid, nowebp=nowebp)}}">{{e}}</a></ul>
+        {% for e in archive.fnlist %}
+        <ul><a class="imglink" id="{{e}}" href="{{url_for('view', aid=aid, fhash=fhash, pid=loop.index0, nowebp=nowebp)}}">{{e}}</a></ul>
         {% endfor %}
 {% endblock %}
 

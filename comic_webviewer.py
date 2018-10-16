@@ -6,6 +6,7 @@ from flask import current_app as capp
 import argparse, os, archive, subprocess, tempfile, logging, shutil, argparse
 
 CWEBP_PATH = shutil.which('cwebp')
+CWEBP_EXTRA_OPTIONS = [ '-mt' ]
 
 def create_app(config):
     app = Flask(__name__)
@@ -23,9 +24,7 @@ def create_app(config):
 
         @app.context_processor
         def inject_config():
-            return dict(nowebp=int(request.args.get('nowebp', 0)), width = int(request.args.get('width', 1080)),
-                    basename=os.path.basename, sep=os.path.sep,
-                    enumerate=enumerate, len=len, min=min, max=max, repo=capp.repo, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
+            return dict(nowebp=int(request.args.get('nowebp', 0)), basename=os.path.basename, sep=os.path.sep, len=len, min=min, max=max, repo=capp.repo, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
 
         @app.route('/')
         def index():
@@ -47,13 +46,13 @@ def create_app(config):
 
             return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar)
 
-        @app.route('/view/<int:aid>/<fhash>')
-        def view(aid, fhash):
-            pid = int(request.args.get('pid'))
+        @app.route('/view/<int:aid>/<fhash>/<int:pid>')
+        def view(aid, fhash, pid):
             fn = capp.repo[aid][ARCHIVE][fhash]['filename']
             ar = archive.Archive(fn)
             if pid < 0 or pid >= len(ar.fnlist):
                 raise RuntimeError("insane pid: %d" % (pid))
+            width = int(request.args.get('width', 512))
             step = app.config['step']
 
             return render_template("view.html", ar=ar, aid=aid, fhash=fhash, pid=pid, fn=fn, archive=ar, step=step, width=width)
@@ -68,7 +67,7 @@ def create_app(config):
                     temp.write(d)
                     temp.flush()
                     null = open(os.devnull, 'wb')
-                    cwebp_cmd = [CWEBP_PATH, '-mt', '-resize', '%d' % (width), '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
+                    cwebp_cmd = [ CWEBP_PATH ] + CWEBP_EXTRA_OPTIONS + [ '-resize', '%d' % (width), '0', '-preset', app.config['webp_preset'], '-q', '%d' % (app.config['webp_quality']), temp.name, '-o', '-']
                     logging.warning(cwebp_cmd)
                     p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
                     stdout, _ = p.communicate()
@@ -86,19 +85,18 @@ def create_app(config):
             fn = capp.repo[aid][ARCHIVE][fhash]['filename']
             ar = archive.Archive(fn)
             pid = 0
-            width = int(request.args.get('width', 128))
+            width = int(request.args.get('width', 512))
             if len(ar.fnlist) == 0:
                 raise RuntimeError("empty archive")
             return make_image(app, ar, pid, width)
 
-        @app.route('/image/<int:aid>/<fhash>')
-        def image(aid, fhash):
+        @app.route('/image/<int:aid>/<fhash>/<int:pid>')
+        def image(aid, fhash, pid):
             fn = capp.repo[aid][ARCHIVE][fhash]['filename']
             ar = archive.Archive(fn)
-            pid = int(request.args.get('pid'))
-            width = int(request.args.get('width', 1080))
             if pid < 0 or pid >= len(ar.fnlist):
                 raise RuntimeError("insane pid: %d" % (pid));
+            width = int(request.args.get('width', 1080))
 
             return make_image(app, ar, pid, width)
     return app
@@ -122,7 +120,7 @@ def main():
     parse.add_argument('--disable-webp', action='store_true', help='disable webp mode')
     parse.add_argument('--port', '-p', type=int, default=5001, help='port to listen on, default: 5001')
     parse.add_argument('--address', '-a', default='127.0.0.1', help='listen address, default: 127.0.0.1')
-    parse.add_argument('--step', type=step_type, default=1, help='specify how many image(s) in one view')
+    parse.add_argument('--step', type=step_type, default=10, help='specify how many image(s) in one view')
     parse.add_argument("directories", nargs="+", help="directory names to serve")
     config = parse.parse_args()
 
