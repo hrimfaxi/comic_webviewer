@@ -1,13 +1,13 @@
 {% macro link_archive() -%}
-    {{url_for('.archive_', aid=aid, fhash=fhash, _anchor=fhash, nowebp=nowebp)}}
+    {{url_for('.archive_', aid=aid, page=page, fhash=fhash, _anchor=fhash, nowebp=nowebp)}}
 {%- endmacro %}
 
 {% macro link_next() -%}
-    {{url_for('.view', aid=aid, fhash=fhash, pid=pid+step, nowebp=nowebp, width=width)}}
+    {{url_for('.view', aid=aid, page=page, fhash=fhash, pid=pid+step, nowebp=nowebp, width=width)}}
 {%- endmacro %}
 
 {% macro link_prev() -%}
-    {{url_for('.view', aid=aid, fhash=fhash, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}
+    {{url_for('.view', aid=aid, page=page, fhash=fhash, pid=max(pid-step, 0), nowebp=nowebp, width=width)}}
 {%- endmacro %}
 
 {% macro progress_bar(ar, pid, step) -%}

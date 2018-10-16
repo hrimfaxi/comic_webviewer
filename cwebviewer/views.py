@@ -23,20 +23,22 @@ def subindex(aid, page=0):
 @cwebviewer_pages.route('/archive/<int:aid>/<fhash>')
 def archive_(aid, fhash):
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
+    page = int(request.args.get('page', 0))
     ar = archive.Archive(fn)
 
-    return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar)
+    return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, page=page, archive=ar)
 
 @cwebviewer_pages.route('/view/<int:aid>/<fhash>/<int:pid>')
 def view(aid, fhash, pid):
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
+    page = int(request.args.get('page', 0))
     ar = archive.Archive(fn)
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid))
     width = int(request.args.get('width', 512))
     step = app.config['STEP']
 
-    return render_template("view.html", ar=ar, aid=aid, fhash=fhash, pid=pid, fn=fn, archive=ar, step=step, width=width)
+    return render_template("view.html", ar=ar, aid=aid, page=page, fhash=fhash, pid=pid, fn=fn, archive=ar, step=step, width=width)
 
 def make_image_response(data):
     res = make_response(data)
