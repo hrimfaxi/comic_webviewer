@@ -3,9 +3,14 @@
 {% block title %}Comic Webviewer{% endblock %}
 
 {% block content %}
+    <table>
     {% for k, v in archives[ARCHIVE].items() %}
-        <ul><a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, nowebp=nowebp)}}">{{v['filename'] | strip_path}}</a></ul>
+        <tr>
+            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, nowebp=nowebp)}}"><img src="{{url_for(".thumbnail", aid=aid, fhash=k, nowebp=nowebp)}}"></a> </td>
+            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, nowebp=nowebp)}}">{{v['filename'] | strip_path}}</td>
+        </tr>
     {% endfor %}
+    </table>
 {% endblock %}
 
 {% block navbar %}
