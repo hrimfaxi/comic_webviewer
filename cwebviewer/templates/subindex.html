@@ -22,8 +22,16 @@
 {% endblock %}
 
 {% block navbar %}
-<nav class="navbar fixed-bottom">
-</div>
+    {% if page > 0 %}
+        <a id=prev href="{{link_prev_page()}}">Prev</a>
+    {% endif %}
+    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
+    {% if page*10+10 < len(archives[ARCHIVE]) %}
+        <a id=next href="{{link_next_page()}}">Next</a>
+    {% endif %}
+{% endblock %}
+
+{% block footer %}
     {% if page > 0 %}
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
