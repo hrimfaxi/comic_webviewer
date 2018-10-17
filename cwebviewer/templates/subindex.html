@@ -8,6 +8,16 @@
     {{url_for('.subindex', aid=aid, page=page-1, nowebp=nowebp, width=width)}}
 {%- endmacro %}
 
+{% macro left_up_prev() -%}
+    {% if page > 0 %}
+        <a id=prev href="{{link_prev_page()}}">Prev</a>
+    {% endif %}
+    <div align=center><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div>
+    {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
+        <a id=next href="{{link_next_page()}}">Next</a>
+    {% endif %}
+{%- endmacro %}
+
 {% block title %}Comic Webviewer{% endblock %}
 
 {% block content %}
@@ -22,21 +32,9 @@
 {% endblock %}
 
 {% block navbar %}
-    {% if page > 0 %}
-        <a id=prev href="{{link_prev_page()}}">Prev</a>
-    {% endif %}
-    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
-    {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
-        <a id=next href="{{link_next_page()}}">Next</a>
-    {% endif %}
+    {{left_up_prev()}}
 {% endblock %}
 
 {% block footer %}
-    {% if page > 0 %}
-        <a id=prev href="{{link_prev_page()}}">Prev</a>
-    {% endif %}
-    <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
-    {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
-        <a id=next href="{{link_next_page()}}">Next</a>
-    {% endif %}
+    {{left_up_prev()}}
 {% endblock %}
