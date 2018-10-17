@@ -9,13 +9,15 @@
 {%- endmacro %}
 
 {% macro left_up_prev() -%}
+    <div align=center>
     {% if page > 0 %}
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
-    <div align=center><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div>
+        <a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a>
     {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
+    </div>
 {%- endmacro %}
 
 {% block title %}Comic Webviewer{% endblock %}
