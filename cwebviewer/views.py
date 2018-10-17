@@ -18,7 +18,7 @@ def index():
 @cwebviewer_pages.route('/<int:aid>/<int:page>')
 def subindex(aid, page=0):
     reload_repo_by_mtime(aid)
-    return render_template("subindex.html", aid=aid, archives=app.repo[aid], page=page, islice=islice)
+    return render_template("subindex.html", aid=aid, archives=app.repo[aid], page=page, arch_per_page=app.config['ARCHIVE_PER_PAGE'], islice=islice)
 
 def fix_up(s):
     try:
@@ -43,9 +43,8 @@ def view(aid, fhash, pid):
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid))
     width = int(request.args.get('width', 512))
-    step = app.config['STEP']
 
-    return render_template("view.html", ar=ar, aid=aid, page=page, fhash=fhash, pid=pid, fn=fn, archive=ar, step=step, width=width)
+    return render_template("view.html", ar=ar, aid=aid, page=page, fhash=fhash, pid=pid, fn=fn, archive=ar, step=app.config['IMG_PER_PAGE'], width=width)
 
 def make_image_response(data):
     res = make_response(data)

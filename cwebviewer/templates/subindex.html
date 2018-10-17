@@ -12,9 +12,9 @@
 
 {% block content %}
     <table>
-    {% for k, v in islice(archives[ARCHIVE].items(), page*10, page*10+10) %}
+    {% for k, v in islice(archives[ARCHIVE].items(), page*arch_per_page, page*arch_per_page+arch_per_page) %}
         <tr>
-            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, nowebp=nowebp, width=512)}}"></a> </td>
+            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, nowebp=nowebp, width=512)}}" width=512></a> </td>
             <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}">{{v['filename'] | strip_path}}</td>
         </tr>
     {% endfor %}
@@ -26,7 +26,7 @@
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
     <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
-    {% if page*10+10 < len(archives[ARCHIVE]) %}
+    {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
 {% endblock %}
@@ -36,7 +36,7 @@
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
     <div align=center style=\"padding: 4px;\"><a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a></div><p>
-    {% if page*10+10 < len(archives[ARCHIVE]) %}
+    {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
 {% endblock %}

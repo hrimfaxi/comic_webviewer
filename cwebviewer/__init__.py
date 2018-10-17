@@ -18,7 +18,8 @@ def create_app(config=None):
             DISABLE_WEBP=False,
             SORT='name',
             REVERSE=False,
-            STEP=20,
+            IMG_PER_PAGE=20,
+            ARCHIVE_PER_PAGE=20,
             DIRECTORIES=[ '.' ],
     )
 
