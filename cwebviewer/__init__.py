@@ -18,7 +18,7 @@ def create_app(config=None):
             DISABLE_WEBP=False,
             SORT='name',
             REVERSE=False,
-            STEP=10,
+            STEP=20,
             DIRECTORIES=[ '.' ],
     )
 

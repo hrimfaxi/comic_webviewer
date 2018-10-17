@@ -23,7 +23,7 @@ def main():
     parse.add_argument('--disable-webp', action='store_true', help='disable webp mode')
     parse.add_argument('--port', '-p', type=int, default=5001, help='port to listen on, default: 5001')
     parse.add_argument('--address', '-a', default='127.0.0.1', help='listen address, default: 127.0.0.1')
-    parse.add_argument('--step', type=step_type, default=10, help='specify how many image(s) in one view')
+    parse.add_argument('--step', type=step_type, default=20, help='specify how many image(s) in one view')
     parse.add_argument("directories", nargs="+", help="directory names to serve")
     config = parse.parse_args()
     d = { k.upper() : v for k, v in vars(config).items() }
