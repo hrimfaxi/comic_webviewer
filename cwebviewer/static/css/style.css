@@ -15,14 +15,14 @@ margin: auto;
     position:absolute;
     left:0;
     transform:translateX(200%);
-    font-size: 20px;
+    font-size: 28px;
 }
 
 #next {
     position:absolute;
     right:0;
     transform:translateX(-200%);
-    font-size: 20px;
+    font-size: 28px;
 }
 
 #up {
