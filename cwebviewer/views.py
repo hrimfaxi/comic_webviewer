@@ -20,13 +20,20 @@ def subindex(aid, page=0):
     reload_repo_by_mtime(aid)
     return render_template("subindex.html", aid=aid, archives=app.repo[aid], page=page, islice=islice)
 
+def fix_up(s):
+    try:
+        r = s.encode('cp437').decode('gbk', errors='ignore')
+    except:
+        r = s
+    return r
+
 @cwebviewer_pages.route('/archive/<int:aid>/<fhash>')
 def archive_(aid, fhash):
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
     page = int(request.args.get('page', 0))
     ar = archive.Archive(fn)
 
-    return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, page=page, archive=ar)
+    return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, page=page, archive=ar, fix_up=fix_up)
 
 @cwebviewer_pages.route('/view/<int:aid>/<fhash>/<int:pid>')
 def view(aid, fhash, pid):
