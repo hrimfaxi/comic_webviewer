@@ -16,10 +16,10 @@ def reload_repo_by_mtime(aid):
     if app.config['SORT'] == 'random' or app.repo[aid][MTIME] < timestamp:
         reload_repo(aid)
 
-def make_image(ar, pid, width, use_webp):
+def make_image(ar, pid, width, conv_webp):
     d = ar.read(pid)
     ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
-    if ext_fn != ".webp" and app.config['WANT_WEBP'] and use_webp:
+    if ext_fn != ".webp" and conv_webp:
         # convert into webp
         # cwebp didn't support stdin/stdout, output to temp file
         with tempfile.NamedTemporaryFile(prefix='comic_webviewer') as temp:

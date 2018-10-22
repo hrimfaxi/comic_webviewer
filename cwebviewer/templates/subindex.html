@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% macro link_next_page() -%}
-    {{url_for('.subindex', aid=aid, page=page+1, nowebp=nowebp, width=width)}}
+    {{url_for('.subindex', aid=aid, page=page+1, width=width)}}
 {%- endmacro %}
 
 {% macro link_prev_page() -%}
-    {{url_for('.subindex', aid=aid, page=page-1, nowebp=nowebp, width=width)}}
+    {{url_for('.subindex', aid=aid, page=page-1, width=width)}}
 {%- endmacro %}
 
 {% macro left_up_prev() -%}
@@ -13,7 +13,7 @@
     {% if page > 0 %}
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
-        <a id=up href="{{url_for('.index', aid=aid, nowebp=nowebp)}} ">Up</a>
+        <a id=up href="{{url_for('.index', aid=aid)}} ">Up</a>
     {% if page*arch_per_page+arch_per_page < len(archives[ARCHIVE]) %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
@@ -26,8 +26,8 @@
     <table>
     {% for k, v in islice(archives[ARCHIVE].items(), page*arch_per_page, page*arch_per_page+arch_per_page) %}
         <tr>
-            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, nowebp=nowebp, width=512)}}" width=512></a> </td>
-            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}">{{relpath(v['filename'], archives[DIRNAME])}}</td>
+            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, width=512)}}" width=512></a> </td>
+            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page)}}">{{relpath(v['filename'], archives[DIRNAME])}}</td>
         </tr>
     {% endfor %}
     </table>
