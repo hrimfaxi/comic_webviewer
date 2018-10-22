@@ -7,6 +7,7 @@ from . import archive
 from .consts import *
 from .models import *
 from itertools import islice
+import os.path
 
 cwebviewer_pages = Blueprint('cwebviewer', __name__)
 
@@ -18,7 +19,7 @@ def index():
 @cwebviewer_pages.route('/<int:aid>/<int:page>')
 def subindex(aid, page=0):
     reload_repo_by_mtime(aid)
-    return render_template("subindex.html", aid=aid, archives=app.repo[aid], page=page, arch_per_page=app.config['ARCHIVE_PER_PAGE'], islice=islice)
+    return render_template("subindex.html", aid=aid, archives=app.repo[aid], page=page, arch_per_page=app.config['ARCHIVE_PER_PAGE'], islice=islice, relpath=os.path.relpath)
 
 def fix_up(s):
     try:

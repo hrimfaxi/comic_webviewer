@@ -27,7 +27,7 @@
     {% for k, v in islice(archives[ARCHIVE].items(), page*arch_per_page, page*arch_per_page+arch_per_page) %}
         <tr>
             <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, nowebp=nowebp, width=512)}}" width=512></a> </td>
-            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}">{{v['filename'] | strip_path}}</td>
+            <td> <a id="{{k}}" href="{{url_for('.archive_', aid=aid, fhash=k, page=page, nowebp=nowebp)}}">{{relpath(v['filename'], archives[DIRNAME])}}</td>
         </tr>
     {% endfor %}
     </table>
