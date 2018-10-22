@@ -4,11 +4,13 @@
 from flask import Flask, render_template, request, make_response, url_for, redirect, Blueprint
 from flask import current_app as app
 import os
+from itertools import islice
 from .views import cwebviewer_pages
 from .consts import *
 
 def create_app(config=None):
     app = Flask(__name__)
+    app.secret_key = os.urandom(16)
     app.config.from_mapping(
             PORT = 5001,
             ADDRESS = "127.0.0.1",
@@ -40,7 +42,7 @@ def create_app(config=None):
         app.register_blueprint(cwebviewer_pages)
         @app.context_processor
         def inject_config():
-            return dict(basename=os.path.basename, len=len, min=min, max=max, app=app, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
+            return dict(basename=os.path.basename, len=len, min=min, max=max, islice=islice, relpath=os.path.relpath, app=app, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
 
     return app
 
