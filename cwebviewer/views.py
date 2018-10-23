@@ -1,12 +1,13 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-from flask import Flask, render_template, request, make_response, url_for, redirect, Blueprint, g, session
+from flask import Flask, render_template, request, make_response, url_for, redirect, Blueprint, g, session, flash
 from flask import current_app as app
 from . import archive
 from .consts import *
 from .models import *
 import os.path
+from math import ceil
 
 cwebviewer_pages = Blueprint('cwebviewer', __name__)
 
@@ -29,19 +30,23 @@ def check_webp():
 
 @cwebviewer_pages.route('/')
 def index():
+    flash('<h1>Comic index: </h1>')
     return render_template("index.html")
 
 @cwebviewer_pages.route('/<int:aid>/')
 @cwebviewer_pages.route('/<int:aid>/<int:page>')
 def subindex(aid, page=0):
-    g.page = session['page'] = page
     reload_repo_by_mtime(aid)
+    total_page = ceil(len(app.repo[aid][ARCHIVE]) / app.config['ARCHIVE_PER_PAGE'])
+    g.page = session['page'] = max(min(page, total_page), 0)
+    flash('<div align=center>%d/%d</div>' % (page+1, total_page))
     return render_template("subindex.html", aid=aid, archives=app.repo[aid])
 
 @cwebviewer_pages.route('/archive/<int:aid>/<fhash>')
 def archive_(aid, fhash):
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
     ar = archive.Archive(fn)
+    flash('<h1>%s</h1>'%(os.path.basename(fn)))
 
     return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar)
 

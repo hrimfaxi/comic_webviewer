@@ -9,6 +9,9 @@
   {% block scripts %}{% endblock %}
   {% block styles %}{% endblock %}
   <body>
+    {% for message in get_flashed_messages() %}
+        {{ message | safe}}
+    {% endfor %}
     <div id="navbar">{% block navbar %}{% endblock %}</div>
     <div id="content">{% block content %}{% endblock %}</div>
     <div id="footer">{% block footer %}{% endblock %}</div>
