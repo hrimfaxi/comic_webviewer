@@ -40,9 +40,12 @@ def create_app(config=None):
         for e in app.repo:
             app.logger.warning("Directory %s: %d archvies loaded." % (e[DIRNAME], len(e[ARCHIVE])))
         app.register_blueprint(cwebviewer_pages)
+        @app.template_filter('strip_path')
+        def strip_path(s, subdir):
+            return os.path.relpath(s, subdir)
         @app.context_processor
         def inject_config():
-            return dict(basename=os.path.basename, len=len, min=min, max=max, islice=islice, relpath=os.path.relpath, app=app, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
+            return dict(basename=os.path.basename, islice=islice, app=app, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
 
     return app
 
