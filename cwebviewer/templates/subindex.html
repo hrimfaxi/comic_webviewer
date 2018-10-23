@@ -14,7 +14,7 @@
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
         <a id=up href="{{url_for('.index', aid=aid)}} ">Up</a>
-    {% if g.page*g.arch_per_page+g.arch_per_page < len(archives[ARCHIVE]) %}
+    {% if g.page*g.arch_per_page+g.arch_per_page < archives[ARCHIVE] | length %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
     </div>

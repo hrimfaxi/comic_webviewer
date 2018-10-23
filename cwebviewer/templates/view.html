@@ -7,12 +7,12 @@
 {%- endmacro %}
 
 {% macro link_prev() -%}
-    {{url_for('.view', aid=aid, page=g.page, fhash=fhash, pid=max(pid-g.step, 0), width=width)}}
+    {{url_for('.view', aid=aid, page=g.page, fhash=fhash, pid=[pid-g.step, 0] | max, width=width)}}
 {%- endmacro %}
 
 {% macro progress_bar(ar, pid, step) -%}
-    {% if pid+1 != min(len(ar.fnlist), pid+step) %}
-        {{pid+1}}-{{min(len(ar.fnlist), pid+step)}} / {{len(ar.fnlist)}}
+    {% if pid+1 != ([ar.fnlist | length, pid+step] | min) %}
+        {{pid+1}}-{{[ar.fnlist | length, pid+step] | min}} / {{ar.fnlist | length}}
     {% else %}
         {{pid+1}} / {{ar.fnlist | length}}
     {% endif %}
@@ -50,7 +50,7 @@ function jump_at_top(e) {
 
 function jump_at_bottom(e) {
     if (atBottom) {
-        window.location.href = "{{ link_next() if pid+g.step < len(ar.fnlist) else link_archive() }}".replace(/&amp;/g, "&");
+        window.location.href = "{{ link_next() if pid+g.step < ar.fnlist | length else link_archive() }}".replace(/&amp;/g, "&");
     }
 }
 
@@ -100,7 +100,7 @@ window.onscroll = function() {
         <a id=prev href="{{link_prev()}}">Prev</a>
     {% endif %}
     <a id=up href="{{link_archive()}}">Up</a>
-    {% if pid+g.step < len(ar.fnlist) %}
+    {% if pid+g.step < ar.fnlist | length %}
         <a id=next href="{{link_next()}}">Next</a>
     {% endif %}
     </div>
@@ -109,7 +109,7 @@ window.onscroll = function() {
 
 {% block content %}
     {% for i in range(g.step) %}
-        {% if pid+i < len(ar.fnlist) %}
+        {% if pid+i < ar.fnlist | length %}
             <img src="{{url_for('.image', aid=aid, fhash=fhash, pid=pid+i, width=width)}}" class="center fit">
         {% endif %}
     {% endfor %}
