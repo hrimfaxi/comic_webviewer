@@ -6,4 +6,7 @@
     {% for e in app.repo %}
     <ul><a id="{{e}}" href="{{url_for('.subindex', aid=loop.index0)}}">{{loop.index}}: {{e[0]}} </a></ul>
     {% endfor %}
+    <p>
+    <a href="{{url_for('.night')}}">Toggle night mode</a>
+    </p>
 {% endblock %}

@@ -28,3 +28,12 @@
 #up {
     font-size: 28px;
 }
+
+body {
+    background-color: black;
+    color: gray;
+}
+
+a:link {
+    color: darkblue;
+}

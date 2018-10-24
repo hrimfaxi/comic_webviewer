@@ -50,6 +50,15 @@ def archive_(aid, fhash):
 
     return render_template("archive.html", aid=aid, fhash=fhash, fn=fn, archive=ar)
 
+@cwebviewer_pages.route('/night')
+def night():
+    try:
+        session['night'] = not session['night']
+    except KeyError:
+        session['night'] = True
+
+    return redirect(url_for('.index'))
+
 @cwebviewer_pages.route('/view/<int:aid>/<fhash>/<int:pid>')
 def view(aid, fhash, pid):
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
