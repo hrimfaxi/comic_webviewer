@@ -1,0 +1,16 @@
+{
+    "DEBUG": true,
+    "ADDRESS": "127.0.0.1",
+    "PORT": 5001,
+    "SORT": "name",
+    "REVERSE": false,
+    "WEBP": true,
+    "WEBP_QUALITY": 5,
+    "WEBP_PRESET": "default",
+    "DISABLE_WEBP": false,
+    "IMG_PER_PAGE": 20,
+    "ARCHIVE_PER_PAGE": 20,
+    "DIRECTORIES":[
+        "."
+    ]
+}
