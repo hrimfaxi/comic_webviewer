@@ -40,13 +40,13 @@ def subindex(aid, page=0):
     flash('<div align=center>%d/%d</div>' % (page+1, total_page))
     return render_template("subindex.html", aid=aid, repo=app.repos[aid])
 
-@cwebviewer_pages.route('/search', methods=['POST'])
+@cwebviewer_pages.route('/search', methods=['GET'])
 def search():
-    aid = int(request.form.get('aid'))
-    keyword = request.form.get('keyword')
+    aid = int(request.args.get('aid'))
+    keyword = request.args.get('keyword')
     if keyword is None:
         return redirect(url_for('.index'))
-    page = int(request.form.get('page', 0))
+    page = int(request.args.get('page', 0))
     reload_repo_by_mtime(aid)
     config = app.repos[aid].config
     g.arch_per_page = config.getint('archive_per_page')

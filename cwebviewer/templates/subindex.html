@@ -43,7 +43,7 @@
 {% block navbar %}
     {{left_up_prev()}}
     <div id=search>
-        <form method='POST' action="{{url_for(".search")}}">
+        <form method='GET' action="{{url_for(".search")}}">
             <input type=text name=keyword></input>
             <input type=hidden name=aid value={{aid}}></input>
             <input type=submit value=Search></input>
