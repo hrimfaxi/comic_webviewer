@@ -24,8 +24,13 @@ def reload_repo_by_mtime(aid):
     if config['sort'] == 'random' or app.repos[aid].st_mtime < timestamp:
         reload_repo(aid)
 
-def gen_redis_id(aid, ar_path, fn_name, width, browser_want_webp):
-    return "%d_%s_%s_%d_%d" % (aid, ar_path, fn_name, width, browser_want_webp)
+def gen_redis_id(aid, ar_path, fn_name, width, browser_want_webp, config):
+    webp_str = "nowebp"
+    if browser_want_webp and config.getboolean('webp'):
+        webp_preset = config['webp_preset']
+        webp_quality = config.getint("webp_quality")
+        webp_str = "%d_%s" % (webp_quality, webp_preset)
+    return "%d_%s_%s_%d_%s" % (aid, ar_path, fn_name, width, webp_str)
 
 def make_image(aid, ar, pid, width, browser_want_webp, config):
     global REDIS
@@ -33,7 +38,7 @@ def make_image(aid, ar, pid, width, browser_want_webp, config):
         REDIS = redis.Redis(host=config['redis_host'], port=config.getint('redis_port'))
         app.logger.warning("Redis enabled")
     if REDIS is not None:
-        id_ = gen_redis_id(aid, ar.path, ar.fnlist[pid], width, browser_want_webp)
+        id_ = gen_redis_id(aid, ar.path, ar.fnlist[pid], width, browser_want_webp, config)
         try:
             r = REDIS.get(id_)
             if r is not None:
