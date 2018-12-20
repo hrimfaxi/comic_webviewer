@@ -42,6 +42,7 @@ def subindex(aid, page=0):
 
 @cwebviewer_pages.route('/archive/<int:aid>/<fhash>')
 def archive_(aid, fhash):
+    g.config = app.repos[aid].config
     fn = app.repos[aid].comics[fhash]['filename']
     ar = Archive(fn)
     flash('<h1>%s</h1>'%(os.path.basename(fn)))

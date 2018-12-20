@@ -8,9 +8,22 @@
 {% endblock %}
 
 {% block content %}
+        <table>
         {% for e in archive.fnlist %}
-        <ul><a class="imglink" id="{{e}}" href="{{url_for('.view', aid=aid, fhash=fhash, pid=loop.index0, page=page)}}">{{g.fix_up(e)}}</a></ul>
+        {% if g.config.getboolean('thumbnail_in_archive') %}
+        <tr>
+            <td>
+                 <img src="{{url_for('.image', aid=aid, fhash=fhash, pid=loop.index0, width=480)}}">
+            </td>
+        </tr>
+        {% endif %}
+        <tr>
+            <td>
+                <a class="imglink" id="{{e}}" href="{{url_for('.view', aid=aid, fhash=fhash, pid=loop.index0, page=page)}}">{{g.fix_up(e)}}</a>
+            </td>
+        </tr>
         {% endfor %}
+        </table>
 {% endblock %}
 
 {% block navbar %}

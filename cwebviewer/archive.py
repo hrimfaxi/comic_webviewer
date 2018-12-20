@@ -98,6 +98,7 @@ def get_dir_config(dirname, app):
             'img_per_page' : app.config['IMG_PER_PAGE'],
             'webp_quality': app.config['WEBP_QUALITY'],
             'webp_preset': app.config['WEBP_PRESET'],
+            'thumbnail_in_archive' : False,
             'cache_time': 3600,
             }
 

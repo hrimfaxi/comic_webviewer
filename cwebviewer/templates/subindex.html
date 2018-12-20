@@ -31,8 +31,10 @@
     <table>
     {% for k, v in islice(repo.comics.items(), g.page*g.arch_per_page, g.page*g.arch_per_page+g.arch_per_page) %}
         <tr>
-           <td> <a class="imglink" id="{{k}}" href="{{url_for('.view', aid=aid, fhash=k, pid=0, page=g.page)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, width=512)}}" width=512></a> </td>
-           <td> <a class="imglink" id="{{e}}" href="{{url_for('.view', aid=aid, fhash=k, pid=0, page=page)}}">{{v['filename'] | strip_path(repo.dirname)}}</a></td>
+            <td> <a class="imglink" id="{{k}}" href="{{url_for('.view', aid=aid, fhash=k, pid=0, page=g.page)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, width=512)}}" width=512></a> </td>
+        </tr>
+        <tr>
+            <td> <div align=center><a class="imglink" id="{{e}}" href="{{url_for('.view', aid=aid, fhash=k, pid=0, page=page)}}">{{v['filename'] | strip_path(repo.dirname)}}</a></div></td>
         </tr>
     {% endfor %}
     </table>
