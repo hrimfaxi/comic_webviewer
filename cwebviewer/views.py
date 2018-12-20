@@ -40,6 +40,23 @@ def subindex(aid, page=0):
     flash('<div align=center>%d/%d</div>' % (page+1, total_page))
     return render_template("subindex.html", aid=aid, repo=app.repos[aid])
 
+@cwebviewer_pages.route('/search', methods=['POST'])
+def search():
+    aid = int(request.form.get('aid'))
+    keyword = request.form.get('keyword')
+    if keyword is None:
+        return redirect(url_for('.index'))
+    page = int(request.form.get('page', 0))
+    reload_repo_by_mtime(aid)
+    config = app.repos[aid].config
+    g.arch_per_page = config.getint('archive_per_page')
+    s = app.repos[aid].search(keyword)
+    total_page = ceil(len(s.comics) / g.arch_per_page)
+    g.page = session['page'] = max(min(page, total_page), 0)
+    flash('<div align=center>%d/%d</div>' % (page+1, total_page))
+    print (s.comics)
+    return render_template("subindex.html", aid=aid, repo=s)
+
 @cwebviewer_pages.route('/archive/<int:aid>/<fhash>')
 def archive_(aid, fhash):
     g.config = app.repos[aid].config

@@ -4,6 +4,7 @@
 import hashlib, os, zipfile, sys, locale, tools, random, configparser
 from collections import OrderedDict
 from io import StringIO
+from copy import deepcopy
 
 rarfile = None
 try:
@@ -87,6 +88,16 @@ class Repo(object):
             r = OrderedDict(x)
 
         self.comics = r
+
+    def search(self, keyword):
+        r = deepcopy(self)
+        x = {}
+        for e in r.comics:
+            if keyword.lower() in r.comics[e]['filename'].lower():
+                x[e] = r.comics[e]
+        del r.comics
+        r.comics = x
+        return r
 
 class Archive(object):
     def __init__(self, path):
