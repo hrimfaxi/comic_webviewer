@@ -7,7 +7,7 @@ from cwebviewer import archive
 from cwebviewer.config import load_json_file
 from .views import cwebviewer_pages
 from .consts import *
-
+from .models import get_dir_config
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -37,8 +37,12 @@ def create_app(config=None):
         if app.config['DISABLE_WEBP'] is False and CWEBP_PATH is not None:
             app.logger.warning("webp enabled, quality: %d, preset: %s" % (app.config['WEBP_QUALITY'], app.config['WEBP_PRESET']))
             app.config['WEBP'] = True
-        app.logger.warning("sorted by %s order%s" % (app.config['SORT'], ", descending" if app.config['REVERSE'] else ""))
-        app.repo = [[dirname, os.stat(dirname).st_mtime, archive.load(dirname, app.config['SORT'], app.config['REVERSE'])] for dirname in app.config['DIRECTORIES']]
+        app.logger.warning("default sorted by %s order%s" % (app.config['SORT'], ", descending" if app.config['REVERSE'] else ""))
+        app.repo = []
+        for dirname in app.config['DIRECTORIES']:
+            iniconfig = get_dir_config(dirname)
+            r = [dirname, os.stat(dirname).st_mtime, archive.load(dirname, iniconfig['default']['sort'], iniconfig['default'].getboolean('reverse')), iniconfig]
+            app.repo.append(r)
         for e in app.repo:
             app.logger.warning("Directory %s: %d archvies loaded." % (e[DIRNAME], len(e[ARCHIVE])))
         app.register_blueprint(cwebviewer_pages)

@@ -3,7 +3,7 @@
 
 import shutil
 
-DIRNAME, MTIME, ARCHIVE = range(3)
+DIRNAME, MTIME, ARCHIVE, CONFIG = range(4)
 CWEBP_EXTRA_OPTIONS = [ '-mt' ]
 CWEBP_PATH = shutil.which('cwebp')
 

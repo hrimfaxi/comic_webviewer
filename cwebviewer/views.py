@@ -23,9 +23,7 @@ def check_webp():
     g.webp = False
     if app.config['WEBP'] and 'image/webp' in request.headers['accept'].split(','):
         g.webp = True
-    g.arch_per_page = app.config['ARCHIVE_PER_PAGE']
     g.fix_up = fix_up
-    g.step=app.config['IMG_PER_PAGE']
     g.page=session.get('page', 0)
 
 @cwebviewer_pages.route('/')
@@ -37,7 +35,9 @@ def index():
 @cwebviewer_pages.route('/<int:aid>/<int:page>')
 def subindex(aid, page=0):
     reload_repo_by_mtime(aid)
-    total_page = ceil(len(app.repo[aid][ARCHIVE]) / app.config['ARCHIVE_PER_PAGE'])
+    config = app.repo[aid][CONFIG]
+    g.arch_per_page=config['default'].getint('archive_per_page')
+    total_page = ceil(len(app.repo[aid][ARCHIVE]) / g.arch_per_page)
     g.page = session['page'] = max(min(page, total_page), 0)
     flash('<div align=center>%d/%d</div>' % (page+1, total_page))
     return render_template("subindex.html", aid=aid, archives=app.repo[aid])
@@ -61,6 +61,8 @@ def night():
 
 @cwebviewer_pages.route('/view/<int:aid>/<fhash>/<int:pid>')
 def view(aid, fhash, pid):
+    config = app.repo[aid][CONFIG]
+    g.step = config['default'].getint('img_per_page')
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
     ar = archive.Archive(fn)
     if pid < 0 or pid >= len(ar.fnlist):
@@ -78,13 +80,14 @@ def make_image_response(data, webp):
 @cwebviewer_pages.route('/image/<int:aid>/<fhash>')
 @cwebviewer_pages.route('/image/<int:aid>/<fhash>/<int:pid>')
 def image(aid, fhash, pid=0):
+    config = app.repo[aid][CONFIG]
     fn = app.repo[aid][ARCHIVE][fhash]['filename']
     ext_fn = os.path.splitext(fn)[-1]
     ar = archive.Archive(fn)
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid));
     width = int(request.args.get('width', 1080))
-    d = make_image(ar, pid, width, g.webp)
+    d = make_image(ar, pid, width, g.webp, config)
     return make_image_response(d,  ext_fn == '.webp' or g.webp)
 
 # vim: set tabstop=4 sw=4 expandtab:
