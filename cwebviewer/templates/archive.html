@@ -4,16 +4,7 @@
 
 {% block scripts %}
         <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
-        <script type="text/javascript" language="JavaScript">
-            $(document).ready(function() {
-                width = $(window).width();
-                height = $(window).height();
-                // console.log('width ' + width + ' height ' + height);
-                $('a.imglink').each(function(o) {
-                    $(this).attr("href", $(this).attr("href") + '&width=' + Math.max(width, height));
-                });
-            });
-        </script>
+        <script src="{{ url_for('static', filename='js/link_width.js') }}"></script>
 {% endblock %}
 
 {% block content %}

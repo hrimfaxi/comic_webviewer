@@ -2,6 +2,10 @@
     {{url_for('.archive_', aid=aid, page=g.page, fhash=fhash, _anchor=fhash)}}
 {%- endmacro %}
 
+{% macro link_subindex() -%}
+    {{url_for('.subindex', aid=aid, _anchor=fhash, page=g.page)}}
+{%- endmacro %}
+
 {% macro link_next() -%}
     {{url_for('.view', aid=aid, page=g.page, fhash=fhash, pid=pid+g.step, width=width)}}
 {%- endmacro %}
@@ -40,7 +44,7 @@ function jump_at_top(e) {
     if (atTop) {
         window.location.href =
         {% if pid == 0 %}
-            '{{link_archive()}}'
+            '{{link_subindex()}}'
         {% else %}
             '{{link_prev()}}'
         {% endif %}
@@ -50,7 +54,7 @@ function jump_at_top(e) {
 
 function jump_at_bottom(e) {
     if (atBottom) {
-        window.location.href = "{{ link_next() if pid+g.step < ar.fnlist | length else link_archive() }}".replace(/&amp;/g, "&");
+        window.location.href = "{{ link_next() if pid+g.step < ar.fnlist | length else link_subindex() }}".replace(/&amp;/g, "&");
     }
 }
 
