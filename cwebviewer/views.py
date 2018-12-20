@@ -85,7 +85,7 @@ def image(aid, fhash, pid=0):
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid));
     width = int(request.args.get('width', 1080))
-    d, is_webp = make_image(ar, pid, width, 'image/webp' in request.headers['accept'].split(','), config)
+    d, is_webp = make_image(aid, ar, pid, width, 'image/webp' in request.headers['accept'].split(','), config)
     return make_image_response(d,  ext_fn == '.webp' or is_webp, config)
 
 # vim: set tabstop=4 sw=4 expandtab:

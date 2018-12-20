@@ -1,10 +1,17 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-import os, tempfile, subprocess
+import os, tempfile, subprocess, pickle
 from flask import current_app as app
 from .consts import *
 from .archive import Repo, get_dir_config
+
+try:
+    import redis
+except ModuleNotFoundError:
+    redis = None
+
+REDIS = None
 
 def reload_repo(aid):
     dirname = app.repos[aid].dirname
@@ -17,7 +24,24 @@ def reload_repo_by_mtime(aid):
     if config['sort'] == 'random' or app.repos[aid].st_mtime < timestamp:
         reload_repo(aid)
 
-def make_image(ar, pid, width, browser_want_webp, config):
+def gen_redis_id(aid, ar_path, fn_name, width, browser_want_webp):
+    return "%d_%s_%s_%d_%d" % (aid, ar_path, fn_name, width, browser_want_webp)
+
+def make_image(aid, ar, pid, width, browser_want_webp, config):
+    global REDIS
+    if REDIS is None and redis is not None and config.getboolean('redis'):
+        REDIS = redis.Redis(host=config['redis_host'], port=config.getint('redis_port'))
+        app.logger.warning("Redis enabled")
+    if REDIS is not None:
+        id_ = gen_redis_id(aid, ar.path, ar.fnlist[pid], width, browser_want_webp)
+        try:
+            r = REDIS.get(id_)
+            app.logger.debug("Cache hit on redis: {}".format(id_))
+            img, webp = pickle.loads(r)
+            return img, webp
+        except:
+            pass
+
     is_webp = False
     d = ar.read(pid)
     ext_fn = os.path.splitext(ar.fnlist[pid])[-1].lower()
@@ -36,6 +60,15 @@ def make_image(ar, pid, width, browser_want_webp, config):
             d = stdout
             del null, p
             is_webp = True
+
+    if REDIS is not None:
+        try:
+            REDIS.set(id_, pickle.dumps((d, is_webp), protocol=-1))
+            app.logger.debug("Store {} on redis".format(id_))
+            REDIS.expire(id_, config.getint('redis_expire_time'))
+        except:
+            pass
+
     return d, is_webp
 
 # vim: set tabstop=4 sw=4 expandtab:

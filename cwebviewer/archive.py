@@ -100,6 +100,10 @@ def get_dir_config(dirname, app):
             'webp_preset': app.config['WEBP_PRESET'],
             'thumbnail_in_archive' : False,
             'cache_time': 3600,
+            'redis': app.config['REDIS'],
+            'redis_host' : app.config['REDIS_HOST'],
+            'redis_port' : app.config['REDIS_PORT'],
+            'redis_expire_time' : app.config['REDIS_EXPIRE_TIME'],
             }
 
     if os.path.isfile(config_fn):
