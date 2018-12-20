@@ -36,7 +36,8 @@ def make_image(aid, ar, pid, width, browser_want_webp, config):
         id_ = gen_redis_id(aid, ar.path, ar.fnlist[pid], width, browser_want_webp)
         try:
             r = REDIS.get(id_)
-            app.logger.debug("Cache hit on redis: {}".format(id_))
+            if r is not None:
+                app.logger.debug("Cache hit on redis: {}".format(id_))
             img, webp = pickle.loads(r)
             return img, webp
         except:
