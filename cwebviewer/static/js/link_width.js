@@ -1,4 +1,3 @@
-<script type="text/javascript" language="JavaScript">
     $(document).ready(function() {
         width = $(window).width();
         height = $(window).height();
@@ -7,4 +6,3 @@
             $(this).attr("href", $(this).attr("href") + '&width=' + Math.max(width, height));
         });
     });
-</script>
