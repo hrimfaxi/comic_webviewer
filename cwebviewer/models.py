@@ -64,9 +64,8 @@ def make_image(aid, ar, pid, width, browser_want_webp, config):
 
     if REDIS is not None:
         try:
-            REDIS.set(id_, pickle.dumps((d, is_webp), protocol=-1))
+            REDIS.set(id_, pickle.dumps((d, is_webp), protocol=-1), ex=config.getint('redis_expire_time'))
             app.logger.debug("Store {} on redis".format(id_))
-            REDIS.expire(id_, config.getint('redis_expire_time'))
         except:
             pass
 
