@@ -1,8 +1,9 @@
 #!/usr/bin/python3
 # coding: utf-8
 
-import hashlib, os, zipfile, sys, locale, tools, random
+import hashlib, os, zipfile, sys, locale, tools, random, configparser
 from collections import OrderedDict
+from io import StringIO
 
 rarfile = None
 try:
@@ -85,5 +86,33 @@ class Archive(object):
             return f.read(self.fnlist[pid])
 
         raise RuntimeError("Cannot open rar: please install python-rarfile")
+
+def get_dir_config(dirname, app):
+    config_fn = os.path.join(dirname, ".comic_webviewer.conf")
+    config = configparser.ConfigParser()
+    config['default'] = {
+            "sort": app.config['SORT'],
+            "reverse" : app.config['REVERSE'],
+            'archive_per_page': app.config['ARCHIVE_PER_PAGE'],
+            'webp': app.config['WEBP'],
+            'img_per_page' : app.config['IMG_PER_PAGE'],
+            'webp_quality': app.config['WEBP_QUALITY'],
+            'webp_preset': app.config['WEBP_PRESET'],
+            'cache_time': 3600,
+            }
+
+    if os.path.isfile(config_fn):
+        inistr = "[default]\n" + open(config_fn).read()
+        io = StringIO(inistr)
+        config.read_file(io)
+
+    return config['default']
+
+class Repo(object):
+    def __init__(self, dirname, app):
+        self.dirname = dirname
+        self.config = get_dir_config(self.dirname, app)
+        self.st_mtime = os.stat(dirname).st_mtime
+        self.comics = load(self.dirname, self.config['sort'], self.config.getboolean('reverse'))
 
 # vim: set tabstop=4 sw=4 expandtab:

@@ -3,11 +3,10 @@ from flask import Flask, render_template, request, make_response, url_for, redir
 from flask import current_app as app
 from itertools import islice
 
-from cwebviewer import archive
 from cwebviewer.config import load_json_file
 from .views import cwebviewer_pages
 from .consts import *
-from .models import get_dir_config
+from .archive import Repo
 
 def create_app(config=None):
     app = Flask(__name__)
@@ -19,7 +18,6 @@ def create_app(config=None):
     #         WEBP=True,
     #         WEBP_QUALITY=5,
     #         WEBP_PRESET='drawing',
-    #         DISABLE_WEBP=False,
     #         SORT='name',
     #         REVERSE=False,
     #         IMG_PER_PAGE=20,
@@ -33,25 +31,23 @@ def create_app(config=None):
         app.config.from_mapping(config)
 
     with app.app_context():
-        app.config['WEBP'] = False
-        if app.config['DISABLE_WEBP'] is False and CWEBP_PATH is not None:
+        if CWEBP_PATH is not None:
             app.logger.warning("webp enabled, quality: %d, preset: %s" % (app.config['WEBP_QUALITY'], app.config['WEBP_PRESET']))
             app.config['WEBP'] = True
+        else:
+            app.config['WEBP'] = False
+
         app.logger.warning("default sorted by %s order%s" % (app.config['SORT'], ", descending" if app.config['REVERSE'] else ""))
-        app.repo = []
-        for dirname in app.config['DIRECTORIES']:
-            iniconfig = get_dir_config(dirname)
-            r = [dirname, os.stat(dirname).st_mtime, archive.load(dirname, iniconfig['default']['sort'], iniconfig['default'].getboolean('reverse')), iniconfig]
-            app.repo.append(r)
-        for e in app.repo:
-            app.logger.warning("Directory %s: %d archvies loaded." % (e[DIRNAME], len(e[ARCHIVE])))
+        app.repos = [ Repo(dirname, app) for dirname in app.config['DIRECTORIES']]
+        for e in app.repos:
+            app.logger.warning("Directory %s: %d archvies loaded." % (e.dirname, len(e.comics)))
         app.register_blueprint(cwebviewer_pages)
         @app.template_filter('strip_path')
         def strip_path(s, subdir):
             return os.path.relpath(s, subdir)
         @app.context_processor
         def inject_config():
-            return dict(basename=os.path.basename, islice=islice, app=app, DIRNAME=DIRNAME, MTIME=MTIME, ARCHIVE=ARCHIVE)
+            return dict(basename=os.path.basename, islice=islice, app=app)
 
     return app
 
