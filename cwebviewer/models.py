@@ -13,32 +13,32 @@ except ModuleNotFoundError:
 
 REDIS = None
 
-def reload_repo(aid):
-    dirname = app.repos[aid].dirname
-    app.repos[aid] = Repo(dirname, app)
+def reload_repo(repo_id):
+    dirname = app.repos[repo_id].dirname
+    app.repos[repo_id] = Repo(dirname, app)
 
-def reload_repo_by_mtime(aid):
-    dirname = app.repos[aid].dirname
+def reload_repo_by_mtime(repo_id):
+    dirname = app.repos[repo_id].dirname
     timestamp = os.stat(dirname).st_mtime
     config = get_dir_config(dirname, app)
-    if config['sort'] == 'random' or app.repos[aid].st_mtime < timestamp:
-        reload_repo(aid)
+    if config['sort'] == 'random' or app.repos[repo_id].st_mtime < timestamp:
+        reload_repo(repo_id)
 
-def gen_redis_id(aid, ar_path, fn_name, width, browser_want_webp, config):
+def gen_redis_id(repo_id, ar_path, fn_name, width, browser_want_webp, config):
     webp_str = "nowebp"
     if browser_want_webp and config.getboolean('webp'):
         webp_preset = config['webp_preset']
         webp_quality = config.getint("webp_quality")
         webp_str = "%d_%s" % (webp_quality, webp_preset)
-    return "%d_%s_%s_%d_%s" % (aid, ar_path, fn_name, width, webp_str)
+    return "%d_%s_%s_%d_%s" % (repo_id, ar_path, fn_name, width, webp_str)
 
-def make_image(aid, ar, pid, width, browser_want_webp, config):
+def make_image(repo_id, ar, pid, width, browser_want_webp, config):
     global REDIS
     if REDIS is None and redis is not None and config.getboolean('redis'):
         REDIS = redis.Redis(host=config['redis_host'], port=config.getint('redis_port'))
         app.logger.warning("Redis enabled")
     if REDIS is not None:
-        id_ = gen_redis_id(aid, ar.path, ar.fnlist[pid], width, browser_want_webp, config)
+        id_ = gen_redis_id(repo_id, ar.path, ar.fnlist[pid], width, browser_want_webp, config)
         try:
             r = REDIS.get(id_)
             if r is not None:

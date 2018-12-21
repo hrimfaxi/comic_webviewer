@@ -1,11 +1,11 @@
 {% extends "base.html" %}
 
 {% macro link_next_page() -%}
-    {{url_for('.subindex', aid=aid, page=g.page+1)}}
+    {{url_for('.subindex', repo_id=repo_id, page=g.page+1)}}
 {%- endmacro %}
 
 {% macro link_prev_page() -%}
-    {{url_for('.subindex', aid=aid, page=g.page-1)}}
+    {{url_for('.subindex', repo_id=repo_id, page=g.page-1)}}
 {%- endmacro %}
 
 {% macro left_up_prev() -%}
@@ -13,7 +13,7 @@
     {% if g.page > 0 %}
         <a id=prev href="{{link_prev_page()}}">Prev</a>
     {% endif %}
-        <a id=up href="{{url_for('.index', aid=aid)}} ">Up</a>
+        <a id=up href="{{url_for('.index', repo_id=repo_id)}} ">Up</a>
     {% if g.page*g.arch_per_page+g.arch_per_page < repo.comics | length %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
@@ -31,10 +31,10 @@
     <table>
     {% for k, v in islice(repo.comics.items(), g.page*g.arch_per_page, g.page*g.arch_per_page+g.arch_per_page) %}
         <tr>
-            <td> <a class="imglink" id="{{k}}" href="{{url_for('.view', aid=aid, fhash=k, pid=0, page=g.page)}}"><img src="{{url_for(".image", aid=aid, pid=0, fhash=k, width=512)}}" width=512></a> </td>
+            <td> <a class="imglink" id="{{k}}" href="{{url_for('.view', repo_id=repo_id, fhash=k, pid=0, page=g.page)}}"><img src="{{url_for(".image", repo_id=repo_id, pid=0, fhash=k, width=512)}}" width=512></a> </td>
         </tr>
         <tr>
-            <td> <div align=center><a class="imglink" id="{{e}}" href="{{url_for('.view', aid=aid, fhash=k, pid=0, page=page)}}">{{v['filename'] | strip_path(repo.dirname)}}</a></div></td>
+            <td> <div align=center><a class="imglink" id="{{e}}" href="{{url_for('.view', repo_id=repo_id, fhash=k, pid=0, page=page)}}">{{v['filename'] | strip_path(repo.dirname)}}</a></div></td>
         </tr>
     {% endfor %}
     </table>
@@ -45,7 +45,7 @@
     <div id=search>
         <form method='GET' action="{{url_for(".search")}}">
             <input type=text name=keyword></input>
-            <input type=hidden name=aid value={{aid}}></input>
+            <input type=hidden name=repo_id value={{repo_id}}></input>
             <input type=submit value=Search></input>
         </form>
     </div>

@@ -1,17 +1,17 @@
 {% macro link_archive() -%}
-    {{url_for('.archive_', aid=aid, page=g.page, fhash=fhash, _anchor=fhash)}}
+    {{url_for('.archive_', repo_id=repo_id, page=g.page, fhash=fhash, _anchor=fhash)}}
 {%- endmacro %}
 
 {% macro link_subindex() -%}
-    {{url_for('.subindex', aid=aid, _anchor=fhash, page=g.page)}}
+    {{url_for('.subindex', repo_id=repo_id, _anchor=fhash, page=g.page)}}
 {%- endmacro %}
 
 {% macro link_next() -%}
-    {{url_for('.view', aid=aid, page=g.page, fhash=fhash, pid=pid+g.step, width=width)}}
+    {{url_for('.view', repo_id=repo_id, page=g.page, fhash=fhash, pid=pid+g.step, width=width)}}
 {%- endmacro %}
 
 {% macro link_prev() -%}
-    {{url_for('.view', aid=aid, page=g.page, fhash=fhash, pid=[pid-g.step, 0] | max, width=width)}}
+    {{url_for('.view', repo_id=repo_id, page=g.page, fhash=fhash, pid=[pid-g.step, 0] | max, width=width)}}
 {%- endmacro %}
 
 {% macro progress_bar(ar, pid, step) -%}
@@ -114,7 +114,7 @@ window.onscroll = function() {
 {% block content %}
     {% for i in range(g.step) %}
         {% if pid+i < ar.fnlist | length %}
-            <img src="{{url_for('.image', aid=aid, fhash=fhash, pid=pid+i, width=width)}}" class="center fit">
+            <img src="{{url_for('.image', repo_id=repo_id, fhash=fhash, pid=pid+i, width=width)}}" class="center fit">
         {% endif %}
     {% endfor %}
 {% endblock %}
