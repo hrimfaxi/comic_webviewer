@@ -62,12 +62,14 @@ def search():
     reload_repo_by_mtime(repo_id)
     config = app.repos[repo_id].config
     g.arch_per_page = config.getint('archive_per_page')
-    s = app.repos[repo_id].search(keyword)
+    order = config['sort']
+    if order == 'random':
+        order = 'name'
+    s = app.repos[repo_id].search(keyword, order, config.getboolean('reverse'))
     total_page = ceil(len(s.comics) / g.arch_per_page)
     g.page = session['page'] = max(min(page, total_page), 0)
     flash('<div align=center>%d/%d</div>' % (page+1, total_page))
-    print (s.comics)
-    return render_template("subindex.html", repo_id=repo_id, repo=s)
+    return render_template("search.html", repo_id=repo_id, repo=s, keyword=keyword, page=page)
 
 @cwebviewer_pages.route('/archive/<int:repo_id>/<fhash>')
 def archive_(repo_id, fhash):

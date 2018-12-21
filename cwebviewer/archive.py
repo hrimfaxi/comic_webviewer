@@ -71,25 +71,26 @@ class Repo(object):
         self.st_mtime = os.stat(dirname).st_mtime
         self.load()
 
+    def sort(self, order, desc):
+        if order == 'name':
+            self.comics = OrderedDict(sorted(self.comics.items(), key=lambda t:t[1]['filename'], reverse=desc))
+        elif order == 'time':
+            self.comics = OrderedDict(sorted(self.comics.items(), key=lambda t:t[1]['mtime'], reverse=desc))
+        elif order == 'size':
+            self.comics = OrderedDict(sorted(self.comics.items(), key=lambda t:t[1]['filesize'], reverse=desc))
+        elif order == 'random':
+            x = list(self.comics.items())
+            random.shuffle(x)
+            self.comics = OrderedDict(x)
+
     def load(self):
+        self.comics = { hashlib.md5(fn.encode('utf-8')).hexdigest(): { 'filename': fn, 'filesize' : os.stat(fn).st_size, 'mtime': os.stat(fn).st_mtime } \
+                for fn in filter(is_archive, every_files_in_directory(self.dirname)) }
         order = self.config['sort']
         desc = self.config.getboolean('reverse')
-        r = { hashlib.md5(fn.encode('utf-8')).hexdigest(): { 'filename': fn, 'filesize' : os.stat(fn).st_size, 'mtime': os.stat(fn).st_mtime } \
-                for fn in filter(is_archive, every_files_in_directory(self.dirname)) }
-        if order == 'name':
-            r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['filename'], reverse=desc))
-        elif order == 'time':
-            r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['mtime'], reverse=desc))
-        elif order == 'size':
-            r = OrderedDict(sorted(r.items(), key=lambda t:t[1]['filesize'], reverse=desc))
-        elif order == 'random':
-            x = list(r.items())
-            random.shuffle(x)
-            r = OrderedDict(x)
+        self.sort(order, desc)
 
-        self.comics = r
-
-    def search(self, keyword):
+    def search(self, keyword, order, desc):
         r = deepcopy(self)
         x = {}
         for e in r.comics:
@@ -97,6 +98,8 @@ class Repo(object):
                 x[e] = r.comics[e]
         del r.comics
         r.comics = x
+        r.sort(order, desc)
+
         return r
 
 class Archive(object):

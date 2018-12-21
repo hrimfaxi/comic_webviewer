@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% macro link_next_page() -%}
+    {{url_for(".search", repo_id=repo_id, keyword=keyword, page=page+1)}}
+{%- endmacro %}
+
+{% macro link_prev_page() -%}
+    {{url_for(".search", repo_id=repo_id, keyword=keyword, page=page-1)}}
+{%- endmacro %}
+
+{% macro left_up_prev() -%}
+    <div align=center>
+    {% if g.page > 0 %}
+        <a id=prev href="{{link_prev_page()}}">Prev</a>
+    {% endif %}
+        <a id=up href="{{url_for('.index', repo_id=repo_id)}} ">Up</a>
+    {% if g.page*g.arch_per_page+g.arch_per_page < repo.comics | length %}
+        <a id=next href="{{link_next_page()}}">Next</a>
+    {% endif %}
+    </div>
+{%- endmacro %}
+
+{% block title %}Comic Webviewer{% endblock %}
+
+{% block scripts %}
+        <script src="{{ url_for('static', filename='js/jquery-3.3.1.min.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/link_width.js') }}"></script>
+{% endblock %}
+
+{% block content %}
+    <table>
+    {% for k, v in islice(repo.comics.items(), g.page*g.arch_per_page, g.page*g.arch_per_page+g.arch_per_page) %}
+        <tr>
+            <td> <a class="imglink" id="{{k}}" href="{{url_for('.view', repo_id=repo_id, fhash=k, pid=0)}}"><img src="{{url_for(".image", repo_id=repo_id, pid=0, fhash=k, width=512)}}" width=512></a> </td>
+        </tr>
+        <tr>
+            <td> <div align=center><a class="imglink" id="{{e}}" href="{{url_for('.view', repo_id=repo_id, fhash=k, pid=0, page=page)}}">{{v['filename'] | strip_path(repo.dirname)}}</a></div></td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}
+
+{% block navbar %}
+    {{left_up_prev()}}
+    <div id=search>
+        <form method='GET' action="{{url_for(".search")}}">
+            <input type=text name=keyword></input>
+            <input type=hidden name=repo_id value={{repo_id}}></input>
+            <input type=submit value=Search></input>
+        </form>
+    </div>
+{% endblock %}
+
+{% block footer %}
+    {{left_up_prev()}}
+{% endblock %}
