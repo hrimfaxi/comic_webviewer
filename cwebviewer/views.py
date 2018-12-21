@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import os.path
-from math import ceil
+from math import ceil, floor
 
 from flask import Flask, render_template, request, make_response, url_for, redirect, Blueprint, g, session, flash
 from flask import current_app as app
@@ -28,6 +28,18 @@ def check_webp():
 def index():
     flash('<h1>Comic index: </h1>')
     return render_template("index.html")
+
+# 根据repo_id和fhash查找页号
+def fhash2page(app, repo_id, fhash):
+    # 未找到返回0
+    if fhash not in app.repos[repo_id].comics:
+        return 0
+
+    idx = list(app.repos[repo_id].comics.keys()).index(fhash)
+    config = app.repos[repo_id].config
+    arch_per_page = config.getint('archive_per_page')
+    page = floor(idx / arch_per_page)
+    return page
 
 @cwebviewer_pages.route('/<int:repo_id>/')
 @cwebviewer_pages.route('/<int:repo_id>/<int:page>')
@@ -60,6 +72,7 @@ def search():
 @cwebviewer_pages.route('/archive/<int:repo_id>/<fhash>')
 def archive_(repo_id, fhash):
     g.config = app.repos[repo_id].config
+    g.fhash2page = fhash2page
     fn = app.repos[repo_id].comics[fhash]['filename']
     ar = Archive(fn)
     flash('<h1>%s</h1>'%(os.path.basename(fn)))
@@ -78,6 +91,7 @@ def night():
 @cwebviewer_pages.route('/view/<int:repo_id>/<fhash>/<int:pid>')
 def view(repo_id, fhash, pid):
     config = app.repos[repo_id].config
+    g.fhash2page = fhash2page
     g.step = config.getint('img_per_page')
     fn = app.repos[repo_id].comics[fhash]['filename']
     ar = Archive(fn)

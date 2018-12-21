@@ -28,6 +28,6 @@
 
 {% block navbar %}
 <div align=center style=\"padding: 4px;\">
-    <a id=up href="{{url_for('.subindex', repo_id=repo_id, _anchor=fhash, page=g.page)}} ">Up</a>
+    <a id=up href="{{url_for('.subindex', repo_id=repo_id, _anchor=fhash, page=g.fhash2page(app, repo_id, fhash))}} ">Up</a>
 </div>
 {% endblock %}
