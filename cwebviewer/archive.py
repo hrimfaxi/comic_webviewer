@@ -64,6 +64,9 @@ def get_dir_config(dirname, app):
 
     return config['default']
 
+def strip_path(s, subdir):
+    return os.path.relpath(s, subdir)
+
 class Repo(object):
     def __init__(self, dirname, app):
         self.dirname = dirname
@@ -94,7 +97,7 @@ class Repo(object):
         r = deepcopy(self)
         x = {}
         for e in r.comics:
-            if keyword.lower() in r.comics[e]['filename'].lower():
+            if keyword.lower() in strip_path(r.comics[e]['filename'], r.dirname).lower():
                 x[e] = r.comics[e]
         del r.comics
         r.comics = x
