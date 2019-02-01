@@ -38,6 +38,18 @@ def every_files_in_directory(directory):
         for name in files:
             yield os.path.join(root, name)
 
+def save_ini(inipath, ini):
+    sio = StringIO()
+    with open(inipath, "w") as inifp:
+        config = configparser.ConfigParser()
+        config['default'] = ini
+        config.write(sio)
+        sio.seek(0)
+        for l in sio:
+            if l == '[default]\n':
+                continue
+            inifp.write(l)
+
 def get_dir_config(dirname, app):
     config_fn = os.path.join(dirname, ".comic_webviewer.conf")
     config = configparser.ConfigParser()
@@ -49,6 +61,7 @@ def get_dir_config(dirname, app):
             'img_per_page' : app.config['IMG_PER_PAGE'],
             'webp_quality': app.config['WEBP_QUALITY'],
             'webp_preset': app.config['WEBP_PRESET'],
+            'resize': True,
             'thumbnail_in_archive' : False,
             'cache_time': 3600,
             'redis': app.config['REDIS'],
@@ -85,6 +98,10 @@ class Repo(object):
             x = list(self.comics.items())
             random.shuffle(x)
             self.comics = OrderedDict(x)
+
+    def reload(self, app):
+        self.config = get_dir_config(self.dirname, app)
+        self.load()
 
     def load(self):
         self.comics = { hashlib.md5(fn.encode('utf-8')).hexdigest(): { 'filename': fn, 'filesize' : os.stat(fn).st_size, 'mtime': os.stat(fn).st_mtime } \

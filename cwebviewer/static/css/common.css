@@ -37,3 +37,8 @@
     top:64px;
     transform:translateX(-10%);
 }
+
+#option {
+    position:absolute;
+    right:16px;
+}

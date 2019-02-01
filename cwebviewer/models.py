@@ -29,8 +29,9 @@ def gen_redis_id(repo_id, ar_path, fn_name, width, browser_want_webp, config):
     if browser_want_webp and config.getboolean('webp'):
         webp_preset = config['webp_preset']
         webp_quality = config.getint("webp_quality")
+        resize = config.getboolean('resize')
         webp_str = "%d_%s" % (webp_quality, webp_preset)
-    return "%d_%s_%s_%d_%s" % (repo_id, ar_path, fn_name, width, webp_str)
+    return "%d_%s_%s_%d_%s_%s" % (repo_id, ar_path, fn_name, width, webp_str, resize)
 
 def make_image(repo_id, ar, pid, width, browser_want_webp, config):
     global REDIS
@@ -58,7 +59,10 @@ def make_image(repo_id, ar, pid, width, browser_want_webp, config):
             temp.write(d)
             temp.flush()
             null = open(os.devnull, 'wb')
-            cwebp_cmd = [ CWEBP_PATH ] + CWEBP_EXTRA_OPTIONS + [ '-resize', '%d' % (width), '0', '-preset', config['webp_preset'], '-q', '%d' % (config.getint('webp_quality')), temp.name, '-o', '-']
+            cwebp_cmd = [ CWEBP_PATH ] + CWEBP_EXTRA_OPTIONS
+            if config.getboolean('resize'):
+                cwebp_cmd += [ '-resize', '%d' % (width), '0', ]
+            cwebp_cmd += [ '-preset', config['webp_preset'], '-q', '%d' % (config.getint('webp_quality')), temp.name, '-o', '-']
             app.logger.warning(cwebp_cmd)
             p = subprocess.Popen(cwebp_cmd, stderr=null, stdout=subprocess.PIPE)
             stdout, _ = p.communicate()

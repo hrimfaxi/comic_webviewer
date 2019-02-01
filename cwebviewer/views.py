@@ -8,7 +8,7 @@ from flask import Flask, render_template, request, make_response, url_for, redir
 from flask import current_app as app
 from .consts import *
 from .models import *
-from .archive import Repo, Archive
+from .archive import Repo, Archive, save_ini
 
 cwebviewer_pages = Blueprint('cwebviewer', __name__)
 
@@ -120,5 +120,38 @@ def image(repo_id, fhash, pid=0):
     width = int(request.args.get('width', 1080))
     d, is_webp = make_image(repo_id, ar, pid, width, 'image/webp' in request.headers['accept'].split(','), config)
     return make_image_response(d,  ext_fn == '.webp' or is_webp, config)
+
+def normalize_boolean(dict_, name):
+    if name in dict_ and dict_[name] == 'on':
+        dict_[name] = True
+    else:
+        dict_[name] = False
+
+def normalize_int(dict_, name):
+    dict_[name] = int(dict_[name])
+
+@cwebviewer_pages.route('/option/<int:repo_id>', methods=['GET', 'POST'])
+def option(repo_id=0):
+    repo = app.repos[repo_id]
+    config = repo.config
+
+    if request.method == "POST":
+        t = request.form.to_dict(flat=True)
+        normalize_boolean(t, 'webp')
+        normalize_boolean(t, 'reverse')
+        normalize_boolean(t, 'resize')
+        normalize_int(t, 'webp_quality')
+        normalize_int(t, 'img_per_page')
+        normalize_int(t, 'cache_time')
+        if 'submit' in t:
+            del(t['submit'])
+        print (t)
+        config_fn = os.path.join(repo.dirname, ".comic_webviewer.conf")
+        print (config_fn)
+        save_ini(config_fn, t)
+        repo.reload(app)
+
+        return redirect(url_for('.subindex', repo_id=repo_id))
+    return render_template('option.html', config=config, repo=repo, repo_id=repo_id)
 
 # vim: set tabstop=4 sw=4 expandtab:
