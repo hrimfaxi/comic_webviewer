@@ -107,6 +107,7 @@ window.onscroll = function() {
     {% if pid+g.step < ar.fnlist | length %}
         <a id=next href="{{link_next()}}">Next</a>
     {% endif %}
+    <a id=option href={{url_for('.option', repo_id=repo_id)}}>Option</a>
     </div>
 </div>
 {% endblock %}
