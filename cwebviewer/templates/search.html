@@ -17,6 +17,7 @@
     {% if g.page*g.arch_per_page+g.arch_per_page < repo.comics | length %}
         <a id=next href="{{link_next_page()}}">Next</a>
     {% endif %}
+	<a id=option href={{url_for('.option', repo_id=repo_id)}}>Option</a>
     </div>
 {%- endmacro %}
 
