@@ -20,11 +20,11 @@ def _format_substring(s):
     return int(s.encode("utf-8").hex(), 16)
 
 " 基于数字排序 "
-def alphanumeric_sort(filenames):
+def alphanumeric_sort(filenames, reverse=False):
     " 排序: 使用lambda函数 "
     " NUMERIC_REGEXP.findall返回数字和非数字 "
     " map对所有返回值调用_format_substring "
-    filenames.sort(key=lambda s: [ _format_substring(e) for e in NUMERIC_REGEXP.findall(s)])
+    filenames.sort(key=lambda s: [ _format_substring(e) for e in NUMERIC_REGEXP.findall(s)], reverse=reverse)
 
 def sorted_by_config(archive_list):
     return sorted_by_time(archive_list)

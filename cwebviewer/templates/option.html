@@ -60,6 +60,10 @@
 				<td><input name=archive_per_page type=number value={{config.getint("archive_per_page")}}></input></td>
 			</tr>
 			<tr>
+				<td>Archive reversed sort order</td>
+				<td><input type="checkbox" name=archive_reverse {{"checked" if config.getboolean("archive_reverse")}}></td>
+			</tr>
+			<tr>
 				<td>Cache time</td>
 				<td><input name=cache_time type=number value={{config.getint("cache_time")}}></input></td>
 			</tr>

@@ -57,6 +57,7 @@ def get_dir_config(dirname, app):
             "sort": app.config['SORT'],
             "reverse" : app.config['REVERSE'],
             'archive_per_page': app.config['ARCHIVE_PER_PAGE'],
+            'archive_reverse' : False,
             'webp': app.config['WEBP'],
             'img_per_page' : app.config['IMG_PER_PAGE'],
             'webp_quality': app.config['WEBP_QUALITY'],
@@ -123,19 +124,19 @@ class Repo(object):
         return r
 
 class Archive(object):
-    def __init__(self, path):
+    def __init__(self, path, reverse):
         self.path = path
 
         if rarfile and is_rar(self.path):
             with rarfile.RarFile(self.path, "r") as f:
                 self.fnlist = [ e for e in f.namelist() if is_image(e) ]
-                tools.alphanumeric_sort(self.fnlist)
+                tools.alphanumeric_sort(self.fnlist, reverse)
             return
 
         if is_zip(self.path):
             with zipfile.ZipFile(self.path, "r") as f:
                 self.fnlist = [ e for e in f.namelist() if is_image(e) ]
-                tools.alphanumeric_sort(self.fnlist)
+                tools.alphanumeric_sort(self.fnlist, reverse)
             return
 
         raise RuntimeError("Cannot open rar: please install python-rarfile")

@@ -76,7 +76,7 @@ def archive_(repo_id, fhash):
     g.config = app.repos[repo_id].config
     g.fhash2page = fhash2page
     fn = app.repos[repo_id].comics[fhash]['filename']
-    ar = Archive(fn)
+    ar = Archive(fn, g.config.getboolean('archive_reverse'))
     flash('<h1>%s</h1>'%(os.path.basename(fn)))
 
     return render_template("archive.html", repo_id=repo_id, fhash=fhash, fn=fn, archive=ar)
@@ -96,7 +96,7 @@ def view(repo_id, fhash, pid):
     g.fhash2page = fhash2page
     g.step = config.getint('img_per_page')
     fn = app.repos[repo_id].comics[fhash]['filename']
-    ar = Archive(fn)
+    ar = Archive(fn, config.getboolean('archive_reverse'))
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid))
     width = int(request.args.get('width', 512))
@@ -114,7 +114,7 @@ def image(repo_id, fhash, pid=0):
     config = app.repos[repo_id].config
     fn = app.repos[repo_id].comics[fhash]['filename']
     ext_fn = os.path.splitext(fn)[-1]
-    ar = Archive(fn)
+    ar = Archive(fn, config.getboolean('archive_reverse'))
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid));
     width = int(request.args.get('width', 1080))
@@ -140,7 +140,9 @@ def option(repo_id=0):
         normalize_boolean(t, 'webp')
         normalize_boolean(t, 'reverse')
         normalize_boolean(t, 'resize')
-        normalize_int(t, 'webp_quality')
+        normalize_boolean(t, 'archive_reverse')
+        if 'webp_quality' in t:
+            normalize_int(t, 'webp_quality')
         normalize_int(t, 'img_per_page')
         normalize_int(t, 'cache_time')
         if 'submit' in t:
