@@ -13,6 +13,7 @@
     "REDIS_EXPIRE_TIME": 3600,
     "IMG_PER_PAGE": 20,
     "ARCHIVE_PER_PAGE": 20,
+    "ARCHIVE_FILENAME_ENCODING": "GBK",
     "DIRECTORIES":[
         "."
     ]

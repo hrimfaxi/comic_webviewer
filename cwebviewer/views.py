@@ -13,16 +13,16 @@ from .ini import save_ini
 
 cwebviewer_pages = Blueprint('cwebviewer', __name__)
 
-def fix_up(s):
+def fix_up_encoding(s):
     try:
-        r = s.encode('cp437').decode('gbk', errors='ignore')
+        r = s.encode('cp437').decode(app.config['ARCHIVE_FILENAME_ENCODING'], errors='ignore')
     except:
         r = s
     return r
 
 @cwebviewer_pages.before_request
 def check_webp():
-    g.fix_up = fix_up
+    g.fix_up_encoding = fix_up_encoding
     g.page=session.get('page', 0)
 
 @cwebviewer_pages.route('/')
@@ -31,13 +31,12 @@ def index():
     return render_template("index.html")
 
 # 根据repo_id和fhash查找页号
-def fhash2page(app, repo_id, fhash):
+def fhash2page(app, config, repo_id, fhash):
     # 未找到返回0
     if fhash not in app.repos[repo_id].comics:
         return 0
 
     idx = list(app.repos[repo_id].comics.keys()).index(fhash)
-    config = app.repos[repo_id].config
     arch_per_page = config.getint('archive_per_page')
     page = floor(idx / arch_per_page)
     return page
@@ -93,11 +92,11 @@ def night():
 
 @cwebviewer_pages.route('/view/<int:repo_id>/<fhash>/<int:pid>')
 def view(repo_id, fhash, pid):
-    config = app.repos[repo_id].config
+    g.config = app.repos[repo_id].config
     g.fhash2page = fhash2page
-    g.step = config.getint('img_per_page')
+    g.step = g.config.getint('img_per_page')
     fn = app.repos[repo_id].comics[fhash]['filename']
-    ar = Archive(fn, config.getboolean('archive_reverse'))
+    ar = Archive(fn, g.config.getboolean('archive_reverse'))
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid))
     width = int(request.args.get('width', 512))
