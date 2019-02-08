@@ -30,13 +30,13 @@ def index():
     flash('<h1>Comic index: </h1>')
     return render_template("index.html")
 
-# 根据repo_id和fhash查找页号
-def fhash2page(app, config, repo_id, fhash):
+# 根据fhash和repo查找对应页号
+def fhash2page(config, repo, fhash):
     # 未找到返回0
-    if fhash not in app.repos[repo_id].comics:
+    if fhash not in repo.comics:
         return 0
 
-    idx = list(app.repos[repo_id].comics.keys()).index(fhash)
+    idx = list(repo.comics.keys()).index(fhash)
     arch_per_page = config.getint('archive_per_page')
     page = floor(idx / arch_per_page)
     return page

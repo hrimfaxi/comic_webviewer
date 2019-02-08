@@ -3,7 +3,7 @@
 {%- endmacro %}
 
 {% macro link_subindex() -%}
-    {{url_for('.subindex', repo_id=repo_id, _anchor=fhash, page=g.fhash2page(app, g.config, repo_id, fhash))}}
+    {{url_for('.subindex', repo_id=repo_id, _anchor=fhash, page=g.fhash2page(g.config, app.repos[repo_id], fhash))}}
 {%- endmacro %}
 
 {% macro link_next() -%}
