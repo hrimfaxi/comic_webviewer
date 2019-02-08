@@ -5,6 +5,7 @@ import hashlib, os, zipfile, sys, locale, tools, random, configparser
 from collections import OrderedDict
 from io import StringIO
 from copy import deepcopy
+from .ini import load_ini
 
 rarfile = None
 try:
@@ -38,53 +39,13 @@ def every_files_in_directory(directory):
         for name in files:
             yield os.path.join(root, name)
 
-def save_ini(inipath, ini):
-    sio = StringIO()
-    with open(inipath, "w") as inifp:
-        config = configparser.ConfigParser()
-        config['default'] = ini
-        config.write(sio)
-        sio.seek(0)
-        for l in sio:
-            if l == '[default]\n':
-                continue
-            inifp.write(l)
-
-def get_dir_config(dirname, app):
-    config_fn = os.path.join(dirname, ".comic_webviewer.conf")
-    config = configparser.ConfigParser()
-    config['default'] = {
-            "sort": app.config['SORT'],
-            "reverse" : app.config['REVERSE'],
-            'archive_per_page': app.config['ARCHIVE_PER_PAGE'],
-            'archive_reverse' : False,
-            'webp': app.config['WEBP'],
-            'img_per_page' : app.config['IMG_PER_PAGE'],
-            'webp_quality': app.config['WEBP_QUALITY'],
-            'webp_preset': app.config['WEBP_PRESET'],
-            'resize': True,
-            'thumbnail_in_archive' : False,
-            'cache_time': 3600,
-            'redis': app.config['REDIS'],
-            'redis_host' : app.config['REDIS_HOST'],
-            'redis_port' : app.config['REDIS_PORT'],
-            'redis_expire_time' : app.config['REDIS_EXPIRE_TIME'],
-            }
-
-    if os.path.isfile(config_fn):
-        inistr = "[default]\n" + open(config_fn).read()
-        io = StringIO(inistr)
-        config.read_file(io)
-
-    return config['default']
-
 def strip_path(s, subdir):
     return os.path.relpath(s, subdir)
 
 class Repo(object):
     def __init__(self, dirname, app):
         self.dirname = dirname
-        self.config = get_dir_config(self.dirname, app)
+        self.config = load_ini(self.dirname, app)
         self.st_mtime = os.stat(dirname).st_mtime
         self.load()
 
@@ -101,7 +62,7 @@ class Repo(object):
             self.comics = OrderedDict(x)
 
     def reload(self, app):
-        self.config = get_dir_config(self.dirname, app)
+        self.config = load_ini(self.dirname, app)
         self.load()
 
     def load(self):

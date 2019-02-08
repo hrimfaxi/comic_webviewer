@@ -4,7 +4,8 @@
 import os, tempfile, subprocess, pickle
 from flask import current_app as app
 from .consts import *
-from .archive import Repo, get_dir_config
+from .archive import Repo
+from .ini import load_ini
 
 try:
     import redis
@@ -20,7 +21,7 @@ def reload_repo(repo_id):
 def reload_repo_by_mtime(repo_id):
     dirname = app.repos[repo_id].dirname
     timestamp = os.stat(dirname).st_mtime
-    config = get_dir_config(dirname, app)
+    config = load_ini(dirname, app)
     if config['sort'] == 'random' or app.repos[repo_id].st_mtime < timestamp:
         reload_repo(repo_id)
 

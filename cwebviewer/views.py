@@ -8,7 +8,8 @@ from flask import Flask, render_template, request, make_response, url_for, redir
 from flask import current_app as app
 from .consts import *
 from .models import *
-from .archive import Repo, Archive, save_ini
+from .archive import Repo, Archive
+from .ini import save_ini
 
 cwebviewer_pages = Blueprint('cwebviewer', __name__)
 
