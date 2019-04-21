@@ -12,19 +12,6 @@ def create_app(config=None):
     app = Flask(__name__)
     app.secret_key = os.urandom(16)
 
-    # app.config.from_mapping(
-    #         PORT = 5001,
-    #         ADDRESS = "127.0.0.1",
-    #         WEBP=True,
-    #         WEBP_QUALITY=5,
-    #         WEBP_PRESET='drawing',
-    #         SORT='name',
-    #         REVERSE=False,
-    #         IMG_PER_PAGE=20,
-    #         ARCHIVE_PER_PAGE=20,
-    #         DIRECTORIES=[ '.' ],
-    # )
-
     if config is None:
         app.config.from_pyfile('config.py', silent=True)
     else:
