@@ -26,6 +26,7 @@ def reload_repo_by_mtime(repo_id):
 
 def gen_redis_id(repo_id, ar_path, fn_name, width, browser_want_webp, config):
     webp_str = "nowebp"
+    resize = False
     if browser_want_webp and config.getboolean('webp'):
         webp_preset = config['webp_preset']
         webp_quality = config.getint("webp_quality")
