@@ -100,7 +100,7 @@ def view(repo_id, fhash, pid):
     if pid < 0 or pid >= len(ar.fnlist):
         raise RuntimeError("insane pid: %d" % (pid))
     width = int(request.args.get('width', 512))
-    return render_template("view.html", ar=ar, repo_id=repo_id, fhash=fhash, pid=pid, fn=fn, archive=ar, width=width)
+    return render_template("view.html", ar=ar, repo_id=repo_id, fhash=fhash, pid=pid, fn=fn, imagefn=ar.fnlist[pid], archive=ar, width=width)
 
 def make_image_response(data, webp, config):
     res = make_response(data)
