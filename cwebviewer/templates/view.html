@@ -115,7 +115,7 @@ window.onscroll = function() {
 {% block content %}
     {% for i in range(g.step) %}
         {% if pid+i < ar.fnlist | length %}
-            <img src="{{url_for('.image', repo_id=repo_id, fhash=fhash, pid=pid+i, width=width, imagefn=imagefn)}}" class="center fit">
+            <img src="{{url_for('.image', repo_id=repo_id, fhash=fhash, pid=pid+i, width=width, imagefn=archive.fnlist[pid+i])}}" class="center fit">
         {% endif %}
     {% endfor %}
 {% endblock %}
