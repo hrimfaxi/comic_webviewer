@@ -39,19 +39,29 @@ def main():
 
     app = create_app(config_dict)
 
-    app.config['BASIC_AUTH_USERNAME'] = 'tutu'
-    app.config['BASIC_AUTH_PASSWORD'] = 'tutuisfat'
-    app.config['BASIC_AUTH_FORCE'] = True
+    if app.config['USE_WEBAUTH']:
+        app.config['BASIC_AUTH_USERNAME'] = app.config['WEBAUTH_USERNAME']
+        app.config['BASIC_AUTH_PASSWORD'] = app.config['WEBAUTH_PASSWORD']
+        app.config['BASIC_AUTH_FORCE'] = True
 
     basic_auth = BasicAuth(app)
 
     app.logger.warning("listen on %s:%d" % (config_dict['ADDRESS'], config_dict['PORT']))
 
+    ad = {
+            'debug': config_dict['DEBUG'],
+            'host': config_dict['ADDRESS'],
+            'port': config_dict['PORT'],
+    }
+
     # To generate a self-signed cert: openssl req -x509 -newkey rsa:4096 -nodes -out cert.pem -keyout key.pem -days 3650
     # Or ECC prime256v1: openssl ecparam -out key.pem -name prime256v1 -genkey
     #     openssl req -new -key key.pem -x509 -nodes -days 365 -out cert.pem
     #     openssl x509 -in cert.pem -noout -text
-    app.run(debug=config_dict['DEBUG'], host=config_dict['ADDRESS'], port=config_dict['PORT'], ssl_context=('cert.pem', 'key.pem'))
+    if app.config['USE_TLS']:
+        ad['ssl_context'] = ('cert.pem', 'key.pem')
+
+    app.run(**ad)
 
 if __name__ == "__main__":
     main()
