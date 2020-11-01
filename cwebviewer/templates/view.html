@@ -59,11 +59,11 @@ function jump_at_bottom(e) {
 }
 
 function update_top() {
-    atTop = document.readyState == "complete" && $(window).scrollTop() == 0;
+    atTop = document.readyState == "complete" && $(window).scrollTop() < 2;
 }
 
 function update_bottom() {
-    atBottom = document.readyState == "complete" && $(window).height() + Math.ceil($(window).scrollTop()) >= document.body.scrollHeight - 10;
+    atBottom = document.readyState == "complete" && $(window).height() + Math.ceil($(window).scrollTop()) >= document.body.scrollHeight - 150;
 }
 
 $(function() {
